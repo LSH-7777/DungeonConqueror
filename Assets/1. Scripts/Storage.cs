@@ -1,3 +1,4 @@
+using Mono.Cecil;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Cinemachine;
@@ -49,16 +50,22 @@ public class Storage : MonoBehaviour
     {
         foreach (Resource res in player.EnumerateBackpackTopDown())
         {
-            Transform slotRoot = slots[addCursor];
+           Transform anchor = nextAnchor[addCursor];
 
-            res.transform.SetParent(slotRoot, true);
-            res.transform.localPosition = Vector3.zero;
+           res.transform.SetParent(anchor, true);
+           res.transform.localPosition = Vector3.zero;
+           res.transform.localRotation = Quaternion.identity;                
 
             stacks[addCursor].Add(res);        // ★ 칸별 스택 push
             meatCount++;
 
+            nextAnchor[addCursor] = res.chain;
+
+            res.gameObject.GetComponent<BoxCollider>().enabled = false;
+            res.gameObject.GetComponent<Rigidbody>().isKinematic = true;           
+
             addCursor = (addCursor + 1) % 4;   // 다음 칸
-            yield return new WaitForSeconds(0.3f);
+            yield return new WaitForSeconds(0.05f);
         }
     }
     public int GetMeatCount() 
@@ -82,7 +89,17 @@ public class Storage : MonoBehaviour
                 meat = stacks[removeCursor][last];
                 stacks[removeCursor].RemoveAt(last);
 
+                if (stacks[removeCursor].Count == 0)
+                {
+                    nextAnchor[removeCursor] = slots[removeCursor];
+                }
+                else
+                {
+                    nextAnchor[removeCursor] = stacks[removeCursor][stacks[removeCursor].Count - 1].chain;
+                }
+
                 meatCount--;
+
                 removeCursor = (removeCursor + 1) % 4;
                 return true;
             }

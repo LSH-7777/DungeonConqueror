@@ -52,8 +52,6 @@ public class Player : MonoBehaviour
         float x = Input.GetAxisRaw("Horizontal") + fixedJoystick.Horizontal;
         float z = Input.GetAxisRaw("Vertical") + fixedJoystick.Vertical;
         
-        rbody.linearVelocity = Vector3.zero;
-
         moveDir = new Vector3(x, 0, z).normalized;
         // moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")); // W,A,S,D
         // moveDir.Normalize();
@@ -62,6 +60,7 @@ public class Player : MonoBehaviour
         {
             transform.rotation = Quaternion.LookRotation(moveDir);
         }
+        rbody.linearVelocity = Vector3.zero;
     }
 
     void UpadateAnim()

@@ -38,4 +38,12 @@ public class NPCSpawner : MonoBehaviour
             yield return new WaitForSeconds(1.0f);
         }
     }
+    public int GetSpawnCount()
+    {
+        return spawnCount;
+    }
+    public int SetSpawnCount()
+    {
+        return spawnCount - 1;
+    }
 }

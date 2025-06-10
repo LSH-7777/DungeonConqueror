@@ -12,9 +12,10 @@ public class CustomerNPC : MonoBehaviour
     
     private GameObject waypoint;
     private Waypoint spot;
-
+    private Waypoint leavePoint;
+    
     private NavMeshAgent agent;
-    private int currentIndex = 0;
+    public int currentIndex = 0;
 
     private int curMeat = 0;
     private int MaxMeat = 5;
@@ -56,6 +57,17 @@ public class CustomerNPC : MonoBehaviour
         // 새로운 목표로 이동할 때마다 도착 감시 시작
         StartCoroutine(WatchArrival());
     }
+    void SetFinalDestination()
+    {
+        agent.isStopped = false;
+
+        agent.SetDestination(meatShop.leavePoint.position);
+        animator.SetBool("isMove", true);
+
+        // 새로운 목표로 이동할 때마다 도착 감시 시작
+        StartCoroutine(WatchArrival());
+    }
+
 
     public void SetQueueIndex(int idx)
     {
@@ -72,11 +84,15 @@ public class CustomerNPC : MonoBehaviour
         //if (agent.remainingDistance <= agent.stoppingDistance)
         //{
             // 다음 목표 설정
-            if (currentIndex < meatShop.waypoints.Length - 1)
+            if (currentIndex < meatShop.waypoints.Length - 1 && currentIndex >= 0)
             {
                 SetQueueIndex(currentIndex);
                 // currentIndex++;
                 SetNextDestination();
+            }
+            else if(currentIndex == -1)
+            {
+                SetFinalDestination();
             }
             else
             {
@@ -112,6 +128,11 @@ public class CustomerNPC : MonoBehaviour
     public void ReceiveMeat(Resource m)
     { 
         curMeat++;
-        progress.value = curMeat / MaxMeat;
+        progress.value = (float)curMeat / MaxMeat;
+    }
+
+    public NavMeshAgent GetNavMeshAgent()
+    {
+        return agent;
     }
 }

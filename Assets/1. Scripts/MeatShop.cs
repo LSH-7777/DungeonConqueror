@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 using System.Collections;
+using UnityEngine.AI;
 
 public class MeatShop : MonoBehaviour
 {
     public Transform[] waypoints;
+    public Transform leavePoint;
 
     private Queue<CustomerNPC> line = new Queue<CustomerNPC>();
     private int curNPC;
 
-    private readonly float term = 0.05f;
+    private readonly float term = 0.5f;
     private float nextTerm = 0f;
 
     public Storage storage;
-
+    public NPCSpawner spawner;
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -48,12 +51,17 @@ public class MeatShop : MonoBehaviour
             return;
 
         CustomerNPC front = line.Dequeue();
-        
+        front.currentIndex = -1;
+
+        //spawner.SetSpawnCount();
+
         int idx = 0;
         foreach (CustomerNPC n in line)
+        {
             n.SetQueueIndex(idx++);
-
-        Destroy(front);
+            n.GetNavMeshAgent().isStopped = false;
+        }
+    
     }
     IEnumerator SellLoop()
     {
@@ -69,6 +77,8 @@ public class MeatShop : MonoBehaviour
                 if (storage.TryPopMeat(out var meat))
                 {
                     front.ReceiveMeat(meat);        // NPC 애니메이션·카운트 증가
+                    
+                    //Destroy(meat.gameObject);
                     yield return new WaitForSeconds(term);
                 }
                 else

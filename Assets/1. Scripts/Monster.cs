@@ -43,11 +43,13 @@ public class Monster : MonoBehaviour
 
     public void SpawnMeat(float damage)
     {
-        for(int i = 0; i < damage*3; i++)
+        for(int i = 0; i < damage*1; i++)
         {
-            Instantiate(meat, transform.position, transform.rotation);
-            Rigidbody rb = meat.GetComponent<Rigidbody>();
-            Vector3 force = new Vector3(Random.Range(-10, 10), Random.Range(5, 15), Random.Range(-10, 3));
+            // 생성된 고기를 참조하여 force를 더함
+            GameObject m = Instantiate(meat, transform.position, transform.rotation);
+            Rigidbody rb = m.GetComponent<Rigidbody>();
+            
+            Vector3 force = new Vector3(Random.Range(-5, 5), Random.Range(5, 15), Random.Range(-5, 5));
             rb.AddForce(force, ForceMode.Impulse);
 
             Debug.Log("고기!");
