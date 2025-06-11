@@ -39,10 +39,10 @@ public class Storage : MonoBehaviour
     void OnTriggerExit(Collider col)
     {
         if(col.TryGetComponent(out Player player))
+        {
             StopCoroutine(Unload(player));
-
-        player.ClearBackpackState();
-        //player = null;
+            player.ClearBackpackState();
+        }
     }
 
 
@@ -89,6 +89,10 @@ public class Storage : MonoBehaviour
                 meat = stacks[removeCursor][last];
                 stacks[removeCursor].RemoveAt(last);
 
+                meat.transform.SetParent(null);
+                meat.gameObject.SetActive(false);
+                // Destroy(meat.gameObject); → 파괴할 경우, 고기를 적재할 때 문제 발생
+
                 if (stacks[removeCursor].Count == 0)
                 {
                     nextAnchor[removeCursor] = slots[removeCursor];
@@ -99,7 +103,6 @@ public class Storage : MonoBehaviour
                 }
 
                 meatCount--;
-
                 removeCursor = (removeCursor + 1) % 4;
                 return true;
             }

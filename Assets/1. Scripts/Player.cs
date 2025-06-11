@@ -12,9 +12,14 @@ public class Player : MonoBehaviour
     public float attackRange = 5f;
 
     public GameObject stack1;
+    public GameObject stack2;
     public int num = 0;
 
-    private Transform stack1Tr;
+    [HideInInspector]
+    public Transform stack1Tr;
+    [HideInInspector]
+    public Transform stack2Tr;
+    
     private Resource meat;
     private Resource curResource;
 
@@ -29,6 +34,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         stack1Tr = stack1.transform;
+        stack2Tr = stack2.transform;
         animator = GetComponent<Animator>();
     }
 
@@ -83,7 +89,7 @@ public class Player : MonoBehaviour
             
             if(Time.time >= nextTerm)
             {
-                Stack(meat);
+                Stack(meat, stack1Tr);
                 nextTerm = Time.time + term;
             }
         }
@@ -131,15 +137,15 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void Stack(Resource resource)
+    public void Stack(Resource resource, Transform stack)
     {
         if (num == 0 && resource != null)
         {
-            resource.gameObject.transform.SetParent(stack1Tr, true);
+            resource.gameObject.transform.SetParent(stack, true);
 
             //StartCoroutine(MoveToStack(resource));
 
-            resource.gameObject.transform.position = new Vector3(stack1Tr.position.x, stack1Tr.position.y, stack1Tr.position.z);
+            resource.gameObject.transform.position = new Vector3(stack.position.x, stack.position.y, stack.position.z);
             resource.gameObject.transform.rotation = stack1Tr.rotation;
             resource.gameObject.GetComponent<Rigidbody>().isKinematic = true;
             num++;

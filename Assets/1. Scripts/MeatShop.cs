@@ -17,7 +17,8 @@ public class MeatShop : MonoBehaviour
     private float nextTerm = 0f;
 
     public Storage storage;
-    public NPCSpawner spawner;
+    public CashSafe cashSafe;
+    //public NPCSpawner spawner;
     
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -25,7 +26,6 @@ public class MeatShop : MonoBehaviour
         curNPC = line.Count;
         StartCoroutine(SellLoop());
     }
-
 
     public void AddNPC(CustomerNPC npc)
     {
@@ -53,32 +53,40 @@ public class MeatShop : MonoBehaviour
         CustomerNPC front = line.Dequeue();
         front.currentIndex = -1;
 
-        //spawner.SetSpawnCount();
-
         int idx = 0;
         foreach (CustomerNPC n in line)
         {
             n.SetQueueIndex(idx++);
             n.GetNavMeshAgent().isStopped = false;
         }
-    
     }
     IEnumerator SellLoop()
     {
         while (true)
         {
-            if (line.Count == 0) { yield return null; continue; }
+            if (line.Count == 0)
+            { 
+                yield return null;
+                continue; 
+            }
+
 
             CustomerNPC front = line.Peek();        // 맨 앞
-            if (!front.HasArrived()) { yield return null; continue; }  // 도착 체크
+            
+            if (!front.HasArrived()) // 도착 확인 
+            { 
+                yield return null;
+                continue; 
+            }  
 
-            if (front.NeedMoreMeat())               // ex) curMeat < MaxMeat
+            if (front.NeedMoreMeat())               // curMeat(현재 구매량) < MaxMeat(필요 고기량)
             {
+                front.BuyMeatAnimation(true); // 구매 요청 애니메이션
+
                 if (storage.TryPopMeat(out var meat))
                 {
                     front.ReceiveMeat(meat);        // NPC 애니메이션·카운트 증가
                     
-                    //Destroy(meat.gameObject);
                     yield return new WaitForSeconds(term);
                 }
                 else
@@ -89,6 +97,8 @@ public class MeatShop : MonoBehaviour
             }
             else
             {
+                front.BuyMeatAnimation(false);
+                front.GiveMoney();
                 RemoveNPC();                        // 다 샀으면 줄에서 빠짐
                 yield return null;
             }

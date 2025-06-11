@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
+//using UnityEngine.UIElements;
 
 public class CustomerNPC : MonoBehaviour
 {
@@ -15,20 +16,24 @@ public class CustomerNPC : MonoBehaviour
     private Waypoint leavePoint;
     
     private NavMeshAgent agent;
-    public int currentIndex = 0;
 
     private int curMeat = 0;
     private int MaxMeat = 5;
 
+    private int cashIdx = 0;
+
     private Animator animator;
     public int QueueIndex => currentIndex;
     public Slider progress;
+    public int currentIndex = 0;
+
+    public GameObject cashObject; 
 
     public event System.Action<CustomerNPC> OnArrivedSpot;
 
     private void Awake()
     {
-        meatShopLine = GameObject.Find("CustomerLine");
+        meatShopLine = GameObject.Find("MeatShop");
         agent = GetComponent<NavMeshAgent>();
     }
 
@@ -124,7 +129,10 @@ public class CustomerNPC : MonoBehaviour
         OnArrivedSpot?.Invoke(this);
     }
 
-    public bool NeedMoreMeat() => curMeat < MaxMeat;
+    public bool NeedMoreMeat()
+    {
+        return curMeat < MaxMeat;
+    }
     public void ReceiveMeat(Resource m)
     { 
         curMeat++;
@@ -134,5 +142,17 @@ public class CustomerNPC : MonoBehaviour
     public NavMeshAgent GetNavMeshAgent()
     {
         return agent;
+    }
+
+    public void BuyMeatAnimation(bool isBuying)
+    {
+        animator.SetBool("Buy", isBuying);
+    }
+
+    public void GiveMoney()
+    {
+        Vector3 pos = meatShop.cashSafe.slots[cashIdx++].position + (Vector3.up  * cashIdx++);
+        Instantiate(cashObject, pos, meatShop.cashSafe.slots[cashIdx++].rotation);
+        
     }
 }

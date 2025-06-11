@@ -12,6 +12,7 @@ public class Monster : MonoBehaviour
     
     public Slider HPprogressBar;
     public GameObject meat;
+    public Transform spawnPoint;
 
     private MonsterAI MonsterAI;
 
@@ -46,13 +47,13 @@ public class Monster : MonoBehaviour
         for(int i = 0; i < damage*1; i++)
         {
             // 생성된 고기를 참조하여 force를 더함
-            GameObject m = Instantiate(meat, transform.position, transform.rotation);
+            GameObject m = Instantiate(meat, spawnPoint.transform.position, spawnPoint.transform.rotation);
             Rigidbody rb = m.GetComponent<Rigidbody>();
             
             Vector3 force = new Vector3(Random.Range(-5, 5), Random.Range(5, 15), Random.Range(-5, 5));
             rb.AddForce(force, ForceMode.Impulse);
 
-            Debug.Log("고기!");
+            //Debug.Log("고기!");
         }
         
     }
