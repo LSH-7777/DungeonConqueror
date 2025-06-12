@@ -4,70 +4,88 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class CashSafe : MonoBehaviour
 {
-    private Player player;
+    public Transform[] slots = new Transform[4]; 
 
-    public Transform[] slots = new Transform[4];
-    Transform[] nextAnchor;
+    private List<Resource>[] stacks = new List<Resource>[4];
+    private Transform[] nextAnchor = new Transform[4];
 
-    List<Resource>[] stacks = new List<Resource>[4];
+    private int addCusor = 0;
+    private int removeCusor = 0;
+    private int cashCount = 0;
 
-    // int addCursor = 0;
-    int removeCursor = 0;
+    private readonly float term = 0.1f;
+    private float nextTerm = 0f;
 
-    int cashCount;
-
-    void Start()
+    private void Awake()
     {
-        player = GetComponent<Player>();
+        for (int i = 0; i < slots.Length; i++)
+        {
+            nextAnchor[i] = slots[i];
+            stacks[i] = new List<Resource>();
+        }
     }
 
-    private void OnTriggerEnter(Collider col)
+    public void AddCash(Resource cash)
     {
-        int last = stacks[removeCursor].Count - 1;
+        Transform anchor = nextAnchor[addCusor];
 
-        if (col.CompareTag("Player"))
-        {
-            if (col.TryGetComponent(out Player player))
-            {
-                player.Stack(stacks[removeCursor][last], player.stack2Tr);
-                TryPopCash(out Resource cash);
-            }
-        }
+        cash.transform.SetParent(anchor, true);
+        cash.transform.localPosition = Vector3.zero;
+        cash.transform.localRotation = Quaternion.identity;
+
+        stacks[addCusor].Add(cash);
+        nextAnchor[addCusor] = cash.chain;
+        cashCount++;
+
+        addCusor = (addCusor + 1) % slots.Length;
     }
 
     public bool TryPopCash(out Resource cash)
     {
         int checkedSlots = 0;
-        while (checkedSlots < 4)
+        while(checkedSlots < slots.Length)
         {
-            if (stacks[removeCursor].Count > 0)
+            if (stacks[removeCusor].Count > 0)
             {
-                int last = stacks[removeCursor].Count - 1;
-                cash = stacks[removeCursor][last];
-                stacks[removeCursor].RemoveAt(last);
+                int last = stacks[removeCusor].Count - 1;
+                cash = stacks[removeCusor][last];
+                stacks[removeCusor].RemoveAt(last);
+
+                nextAnchor[removeCusor] = (stacks[removeCusor].Count == 0) 
+                                            ? slots[removeCusor] : stacks[removeCusor][stacks[removeCusor].Count - 1].chain;
+
 
                 cash.transform.SetParent(null);
                 cash.gameObject.SetActive(false);
 
-                if (stacks[removeCursor].Count == 0)
-                {
-                    nextAnchor[removeCursor] = slots[removeCursor];
-                }
-                else
-                {
-                    nextAnchor[removeCursor] = stacks[removeCursor][stacks[removeCursor].Count - 1].chain;
-                }
-
                 cashCount--;
-                removeCursor = (removeCursor + 1) % 4;
+                removeCusor = (removeCusor + 1) % stacks.Length;
+                
                 return true;
             }
-
-            removeCursor = (removeCursor + 1) % 4;
+            removeCusor = (removeCusor + 1) % stacks.Length;
             checkedSlots++;
         }
 
         cash = null;
         return false;
-    }  
+    }
+
+    public int GetCashCount()
+    {
+        return cashCount;
+    }
+
+    private void OnTriggerStay(Collider col)
+    {
+        if(col.CompareTag("Player"))
+        {
+            if(col.TryGetComponent(out Player player) && TryPopCash(out Resource cash))
+            {
+                cash.gameObject.SetActive(true);
+                player.StackCash(cash);
+            }
+        }
+    }
+
 }

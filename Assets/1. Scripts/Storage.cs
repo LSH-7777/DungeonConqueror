@@ -41,7 +41,7 @@ public class Storage : MonoBehaviour
         if(col.TryGetComponent(out Player player))
         {
             StopCoroutine(Unload(player));
-            player.ClearBackpackState();
+            player.ClearBackpackState(player.GetCurMeat());
         }
     }
 
@@ -61,7 +61,7 @@ public class Storage : MonoBehaviour
 
             nextAnchor[addCursor] = res.chain;
 
-            res.gameObject.GetComponent<BoxCollider>().enabled = false;
+            res.gameObject.GetComponent<Collider>().enabled = false;
             res.gameObject.GetComponent<Rigidbody>().isKinematic = true;           
 
             addCursor = (addCursor + 1) % 4;   // 다음 칸

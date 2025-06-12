@@ -13,7 +13,7 @@ public class MeatShop : MonoBehaviour
     private Queue<CustomerNPC> line = new Queue<CustomerNPC>();
     private int curNPC;
 
-    private readonly float term = 0.5f;
+    private readonly float term = 0.1f;
     private float nextTerm = 0f;
 
     public Storage storage;

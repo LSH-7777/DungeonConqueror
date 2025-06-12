@@ -151,8 +151,9 @@ public class CustomerNPC : MonoBehaviour
 
     public void GiveMoney()
     {
-        Vector3 pos = meatShop.cashSafe.slots[cashIdx++].position + (Vector3.up  * cashIdx++);
-        Instantiate(cashObject, pos, meatShop.cashSafe.slots[cashIdx++].rotation);
+        Vector3 spwanPos = transform.position + transform.forward * 0.2f + Vector3.up * 1.0f;
+        Resource cash = Instantiate(cashObject, spwanPos, transform.rotation).GetComponent<Resource>();
         
+        meatShop.cashSafe.AddCash(cash);
     }
 }
