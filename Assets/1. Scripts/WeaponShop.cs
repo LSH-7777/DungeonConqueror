@@ -5,15 +5,19 @@ public class WeaponShop : MonoBehaviour
 {
     public Text CashText;
 
+    private int curCash = 0;
     private int requiredCash = 1000;
-    private int payment = 0;
+    private int payment = 100;
 
     private readonly float term = 0.1f;
     private float nextTerm = 0f;
 
+    private int weaponLevel = 1;
+
     private void Start()
     {
-        UpdateText();
+        curCash = requiredCash;
+        UpdateText(requiredCash);
     }
 
 
@@ -34,15 +38,19 @@ public class WeaponShop : MonoBehaviour
                     {
                         Debug.Log(player.cashStack.Count - 1);
 
-                        player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
+                        //player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
                         Destroy(player.cashStack[player.cashStack.Count - 1].gameObject);
                         player.cashStack.RemoveAt(player.cashStack.Count - 1);
                         player.ClearBackpackState(player.GetCurCash());
 
-                        payment = 10;
-                        requiredCash -= payment;
+                        curCash -= payment;
 
-                        UpdateText();
+                        if (curCash == 0)
+                        {
+                            UpgradeWeapon(player);
+                        }
+                        UpdateText(curCash);
+                        
                         nextTerm = Time.time + term;
                     }
                 }
@@ -50,9 +58,32 @@ public class WeaponShop : MonoBehaviour
         }
     }
 
-    void UpdateText()
+    void UpdateText(int curCash)
     {
-        int CurCash = requiredCash - payment;
-        CashText.text = "남은 액수 : " + CurCash.ToString() + " 원";
+        CashText.text = "남은 액수 : " + curCash.ToString() + " 원";
+    }
+
+    private void UpgradeWeapon(Player player)
+    {      
+        if (player.weapons[weaponLevel - 1].gameObject != null && player.weapons[weaponLevel].gameObject != null)
+        {
+            player.weapons[weaponLevel - 1].gameObject.SetActive(false);
+            player.weapons[weaponLevel].gameObject.SetActive(true);
+        }
+        weaponLevel++;
+        requiredCash *= weaponLevel;
+
+        curCash = requiredCash;
+
+        switch(weaponLevel)
+        {
+            case 1 : 
+                player.SetAnim().SetBool("Axe", true);
+                player.SetAnim().SetBool("CrossBow", false); break;
+            case 2:
+                player.SetAnim().SetBool("Axe", false);
+                player.SetAnim().SetBool("CrossBow", true); break;
+
+        }
     }
 }

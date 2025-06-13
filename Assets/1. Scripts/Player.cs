@@ -37,11 +37,14 @@ public class Player : MonoBehaviour
     private float nextTerm = 0f;
 
     public List<Resource> cashStack = new List<Resource>();
+
+    public GameObject[] weapons;
     private void Start()
     {
         stack1Tr = stack1.transform;
         stack2Tr = stack2.transform;
         animator = GetComponent<Animator>();
+        animator.SetBool("Axe", true);
     }
 
     void Update()
@@ -49,6 +52,8 @@ public class Player : MonoBehaviour
         PlayerMove();
         UpadateAnim();
         StopToWall();
+        OnSight();
+        RangeAttack();
     }
 
     void FixedUpdate()
@@ -135,13 +140,22 @@ public class Player : MonoBehaviour
     {
         if (enemy != null)
         distance = Vector3.Distance(enemyTr.position, transform.position);
-
+       
         if (distance <= attackRange)
         {
             animator.SetBool("Attack", true);
             Debug.Log("공격!");
         }
     }
+
+    private void RangeAttack()
+    {
+        if(OnSight())
+        {
+            animator.SetBool("OnSight", true);
+        }
+    }
+
 
     public void Stack(Resource resource)
     {
@@ -242,5 +256,16 @@ public class Player : MonoBehaviour
     public Resource GetCurCash()
     {
         return curCash;
+    }
+
+    public Animator SetAnim()
+    {
+        return animator;
+    }
+
+    public bool OnSight()
+    {
+        Debug.DrawRay(transform.position, transform.forward * 20 + Vector3.up, Color.red);
+        return Physics.Raycast(transform.position + transform.up, transform.forward, 20, LayerMask.GetMask("ENEMY"));
     }
 }

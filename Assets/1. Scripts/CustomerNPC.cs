@@ -54,9 +54,11 @@ public class CustomerNPC : MonoBehaviour
     }
 
     // 현재 currentIndex에 해당하는 웨이포인트로 경로 설정
-    void SetNextDestination()
+    public void SetNextDestination()
     {
-        agent.SetDestination(meatShop.waypoints[meatShop.waypoints.Length - currentIndex - 1].position);
+        int idx = (meatShop.waypoints.Length - 1) - currentIndex;
+        
+        agent.SetDestination(meatShop.waypoints[idx].position);
         animator.SetBool("isMove", true);
 
         // 새로운 목표로 이동할 때마다 도착 감시 시작
@@ -95,7 +97,7 @@ public class CustomerNPC : MonoBehaviour
                 // currentIndex++;
                 SetNextDestination();
             }
-            else if(currentIndex == -1)
+            else if(currentIndex < 0)
             {
                 SetFinalDestination();
             }

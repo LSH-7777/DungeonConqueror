@@ -33,9 +33,8 @@ public class NPCSpawner : MonoBehaviour
                 //Instantiate(CustomerNPC, NPCSpawnPoint.position, NPCSpawnPoint.rotation);
                 npc = Instantiate(CustomerNPC, NPCSpawnPoint.position, NPCSpawnPoint.rotation).GetComponent<CustomerNPC>();
                 meatShop.AddNPC(npc);
-
             }
-            yield return new WaitForSeconds(1.0f);
+            yield return new WaitForSeconds(0.75f);
         }
     }
     public int GetSpawnCount(CustomerNPC npc)

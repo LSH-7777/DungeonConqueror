@@ -13,7 +13,7 @@ public class MeatShop : MonoBehaviour
     private Queue<CustomerNPC> line = new Queue<CustomerNPC>();
     private int curNPC;
 
-    private readonly float term = 0.1f;
+    private readonly float term = 0.3f;
     private float nextTerm = 0f;
 
     public Storage storage;
@@ -51,12 +51,13 @@ public class MeatShop : MonoBehaviour
             return;
 
         CustomerNPC front = line.Dequeue();
-        front.currentIndex = -1;
+        front.currentIndex = -10;
 
         int idx = 0;
         foreach (CustomerNPC n in line)
         {
             n.SetQueueIndex(idx++);
+            n.SetNextDestination();
             n.GetNavMeshAgent().isStopped = false;
         }
     }
