@@ -13,6 +13,7 @@ public class WeaponShop : MonoBehaviour
     private float nextTerm = 0f;
 
     private int weaponLevel = 1;
+    private int last = 0;
 
     private void Start()
     {
@@ -28,8 +29,21 @@ public class WeaponShop : MonoBehaviour
             Debug.Log("플레이어 접촉");
             if (col.TryGetComponent(out Player player))
             {
+                if (player.cashStack.Count > 0)
+                {
+                    last = player.cashStack.Count - 1;
+                    if (player.cashStack[last].gameObject == null)
+                    {
+                        player.cashStack.RemoveAt(last);
+                        return;
+                    }
+                }
+                
                 Debug.Log("플레이어 컴포넌트 확인");
-                if(player.cashStack == null) return;
+                if(player.cashStack == null)
+                    return;
+
+
 
                 if (player.cashStack != null && player.cashStack.Count > 0)
                 {
@@ -64,7 +78,9 @@ public class WeaponShop : MonoBehaviour
     }
 
     private void UpgradeWeapon(Player player)
-    {      
+    {
+        if (weaponLevel > player.weapons.Length) return;
+
         if (player.weapons[weaponLevel - 1].gameObject != null && player.weapons[weaponLevel].gameObject != null)
         {
             player.weapons[weaponLevel - 1].gameObject.SetActive(false);
@@ -82,8 +98,8 @@ public class WeaponShop : MonoBehaviour
                 player.SetAnim().SetBool("CrossBow", false); break;
             case 2:
                 player.SetAnim().SetBool("Axe", false);
-                player.SetAnim().SetBool("CrossBow", true); break;
-
+                player.SetAnim().SetBool("CrossBow", true);
+                player.EquipWeapon(player.weapons[weaponLevel - 1]); break;
         }
     }
 }

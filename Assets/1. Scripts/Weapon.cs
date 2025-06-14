@@ -5,7 +5,12 @@ public class Weapon : MonoBehaviour
     private float attackRange = 1f;
     private float attackPower = 1f;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    protected Player owner;
+
+    public void SetOwner(Player player)
+    {
+        this.owner = player;
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -15,7 +20,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    void Attack()
+    protected virtual void Attack()
     {
         Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange);
         foreach (var hitCollider in hitColliders)

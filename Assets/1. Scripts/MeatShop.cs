@@ -80,7 +80,7 @@ public class MeatShop : MonoBehaviour
                 continue; 
             }  
 
-            if (front.NeedMoreMeat())               // curMeat(현재 구매량) < MaxMeat(필요 고기량)
+            if (front.NeedMoreMeat())        // curMeat(현재 구매량) < MaxMeat(필요 고기량)
             {
                 front.BuyMeatAnimation(true); // 구매 요청 애니메이션
 

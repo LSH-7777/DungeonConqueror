@@ -36,6 +36,7 @@ public class Player : MonoBehaviour
     private readonly float term = 0.05f;
     private float nextTerm = 0f;
 
+    public List<Resource> meatStack = new List<Resource>();
     public List<Resource> cashStack = new List<Resource>();
 
     public GameObject[] weapons;
@@ -45,6 +46,7 @@ public class Player : MonoBehaviour
         stack2Tr = stack2.transform;
         animator = GetComponent<Animator>();
         animator.SetBool("Axe", true);
+        EquipWeapon(weapons[0]);
     }
 
     void Update()
@@ -53,7 +55,7 @@ public class Player : MonoBehaviour
         UpadateAnim();
         StopToWall();
         OnSight();
-        RangeAttack();
+        // RangeAttack();
     }
 
     void FixedUpdate()
@@ -61,6 +63,14 @@ public class Player : MonoBehaviour
         if (!StopToWall())
         {
             rbody.MovePosition(rbody.position + moveDir * moveSpeed * Time.fixedDeltaTime);
+        }
+    }
+    public void EquipWeapon(GameObject weaponObject)
+    {
+        Weapon weapon = weaponObject.GetComponent<Weapon>();
+        if (weapon != null)
+        {
+            weapon.SetOwner(this);
         }
     }
 
@@ -148,18 +158,36 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void RangeAttack()
-    {
-        if(OnSight())
-        {
-            animator.SetBool("OnSight", true);
-        }
-    }
-
 
     public void Stack(Resource resource)
     {
         Transform stack = stack1Tr;
+
+        //if (meat == null) return;
+
+        //if (curMeat == null)     // 첫 고기
+        //{
+        //    meat.transform.SetParent(stack, true);
+        //    meat.transform.position = stack.position;
+        //    meat.transform.rotation = stack.rotation;
+        //    curMeat = meat;
+
+        //    meatStack.Add(meat);
+        //    Debug.Log(meatStack.Count);
+        //if (meat.gameObject.GetComponent<Rigidbody>() != null)
+        //    meat.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+        //    return;
+        //}
+
+        //meat.transform.SetParent(curMeat.chain, true);
+        //meat.transform.position = curMeat.chain.position;
+        //meat.transform.rotation = curMeat.chain.rotation;
+        //curMeat = meat;
+
+        //meatStack.Add(meat);
+
+        //if (meat.gameObject.GetComponent<Rigidbody>() != null)
+        //    meat.gameObject.GetComponent<Rigidbody>().isKinematic = true;
 
         if (num == 0 && resource != null)
         {
@@ -169,8 +197,8 @@ public class Player : MonoBehaviour
 
             resource.gameObject.transform.position = new Vector3(stack.position.x, stack.position.y, stack.position.z);
             resource.gameObject.transform.rotation = stack.rotation;
-            
-            if(resource.gameObject.GetComponent<Rigidbody>() != null)
+
+            if (resource.gameObject.GetComponent<Rigidbody>() != null)
                 resource.gameObject.GetComponent<Rigidbody>().isKinematic = true;
             num++;
 
@@ -267,5 +295,14 @@ public class Player : MonoBehaviour
     {
         Debug.DrawRay(transform.position, transform.forward * 20 + Vector3.up, Color.red);
         return Physics.Raycast(transform.position + transform.up, transform.forward, 20, LayerMask.GetMask("ENEMY"));
+    }
+
+    public void RangeAttack()
+    {
+        CrossBow weapon = weapons[1].GetComponent<CrossBow>();
+        if (weapon != null)
+        {
+            weapon.Fire();
+        }
     }
 }
