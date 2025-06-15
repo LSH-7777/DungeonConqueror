@@ -20,7 +20,7 @@ public class CustomerNPC : MonoBehaviour
     private int curMeat = 0;
     private int MaxMeat = 5;
 
-    private int cashIdx = 0;
+    // private int cashIdx = 0;
 
     private Animator animator;
     public int QueueIndex => currentIndex;

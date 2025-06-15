@@ -9,12 +9,12 @@ public class CashSafe : MonoBehaviour
     private List<Resource>[] stacks = new List<Resource>[4];
     private Transform[] nextAnchor = new Transform[4];
 
-    private int addCusor = 0;
-    private int removeCusor = 0;
+    private int addCursor = 0;
+    private int removeCursor = 0;
     private int cashCount = 0;
 
-    private readonly float term = 0.1f;
-    private float nextTerm = 0f;
+    //private readonly float term = 0.1f;
+    //private float nextTerm = 0f;
 
     private void Awake()
     {
@@ -27,17 +27,17 @@ public class CashSafe : MonoBehaviour
 
     public void AddCash(Resource cash)
     {
-        Transform anchor = nextAnchor[addCusor];
+        Transform anchor = nextAnchor[addCursor];
 
         cash.transform.SetParent(anchor, true);
         cash.transform.localPosition = Vector3.zero;
         cash.transform.localRotation = Quaternion.identity;
 
-        stacks[addCusor].Add(cash);
-        nextAnchor[addCusor] = cash.chain;
+        stacks[addCursor].Add(cash);
+        nextAnchor[addCursor] = cash.chain;
         cashCount++;
 
-        addCusor = (addCusor + 1) % slots.Length;
+        addCursor = (addCursor + 1) % slots.Length;
     }
 
     public bool TryPopCash(out Resource cash)
@@ -45,25 +45,25 @@ public class CashSafe : MonoBehaviour
         int checkedSlots = 0;
         while(checkedSlots < slots.Length)
         {
-            if (stacks[removeCusor].Count > 0)
+            if (stacks[removeCursor].Count > 0)
             {
-                int last = stacks[removeCusor].Count - 1;
-                cash = stacks[removeCusor][last];
-                stacks[removeCusor].RemoveAt(last);
+                int last = stacks[removeCursor].Count - 1;
+                cash = stacks[removeCursor][last];
+                stacks[removeCursor].RemoveAt(last);
 
-                nextAnchor[removeCusor] = (stacks[removeCusor].Count == 0) 
-                                            ? slots[removeCusor] : stacks[removeCusor][stacks[removeCusor].Count - 1].chain;
+                nextAnchor[removeCursor] = (stacks[removeCursor].Count == 0) 
+                                            ? slots[removeCursor] : stacks[removeCursor][stacks[removeCursor].Count - 1].chain;
 
 
                 cash.transform.SetParent(null);
                 cash.gameObject.SetActive(false);
 
                 cashCount--;
-                removeCusor = (removeCusor + 1) % stacks.Length;
+                removeCursor = (removeCursor + 1) % stacks.Length;
                 
                 return true;
             }
-            removeCusor = (removeCusor + 1) % stacks.Length;
+            removeCursor = (removeCursor + 1) % stacks.Length;
             checkedSlots++;
         }
 
@@ -83,7 +83,7 @@ public class CashSafe : MonoBehaviour
             if(col.TryGetComponent(out Player player) && TryPopCash(out Resource cash))
             {
                 cash.gameObject.SetActive(true);
-                player.StackCash(cash);
+                player.StackResource(cash, player.stack2Tr, player.cashStack);
             }
         }
     }

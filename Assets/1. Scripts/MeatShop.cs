@@ -14,7 +14,7 @@ public class MeatShop : MonoBehaviour
     private int curNPC;
 
     private readonly float term = 0.3f;
-    private float nextTerm = 0f;
+    //private float nextTerm = 0f;
 
     public Storage storage;
     public CashSafe cashSafe;

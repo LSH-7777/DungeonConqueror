@@ -14,14 +14,13 @@ public class Player : MonoBehaviour
     public GameObject stack1;
     public GameObject stack2;
 
-    private Transform curStack;
-    private int num = 0;
-
     [HideInInspector]
     public Transform stack1Tr;
     [HideInInspector]
     public Transform stack2Tr;
-    
+
+    private Resource curRes;
+
     private Resource meat;
     private Resource curMeat;
 
@@ -55,7 +54,6 @@ public class Player : MonoBehaviour
         UpadateAnim();
         StopToWall();
         OnSight();
-        // RangeAttack();
     }
 
     void FixedUpdate()
@@ -80,8 +78,6 @@ public class Player : MonoBehaviour
         float z = Input.GetAxisRaw("Vertical") + fixedJoystick.Vertical;
         
         moveDir = new Vector3(x, 0, z).normalized;
-        // moveDir = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")); // W,A,S,D
-        // moveDir.Normalize();
 
         if (moveDir != Vector3.zero)
         {
@@ -100,9 +96,6 @@ public class Player : MonoBehaviour
         if(col.CompareTag("ENEMY"))
         {
             enemy = col.gameObject;
-            //animator.SetBool("Attack", other.CompareTag("ENEMY"));
-            Debug.Log(enemy.name);
-            Debug.Log("Enter");
         }
         else if(col.CompareTag("MEAT"))
         {
@@ -110,7 +103,7 @@ public class Player : MonoBehaviour
             
             if(Time.time >= nextTerm)
             {
-                Stack(meat);
+                StackResource(meat, stack1Tr, meatStack);
                 nextTerm = Time.time + term;
             }
         }
@@ -158,132 +151,51 @@ public class Player : MonoBehaviour
         }
     }
 
-
-    public void Stack(Resource resource)
+    public void StackResource(Resource res, Transform stack, List<Resource> resStack)
     {
-        Transform stack = stack1Tr;
+        if (res == null) return;
 
-        //if (meat == null) return;
-
-        //if (curMeat == null)     // 첫 고기
-        //{
-        //    meat.transform.SetParent(stack, true);
-        //    meat.transform.position = stack.position;
-        //    meat.transform.rotation = stack.rotation;
-        //    curMeat = meat;
-
-        //    meatStack.Add(meat);
-        //    Debug.Log(meatStack.Count);
-        //if (meat.gameObject.GetComponent<Rigidbody>() != null)
-        //    meat.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-        //    return;
-        //}
-
-        //meat.transform.SetParent(curMeat.chain, true);
-        //meat.transform.position = curMeat.chain.position;
-        //meat.transform.rotation = curMeat.chain.rotation;
-        //curMeat = meat;
-
-        //meatStack.Add(meat);
-
-        //if (meat.gameObject.GetComponent<Rigidbody>() != null)
-        //    meat.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-
-        if (num == 0 && resource != null)
+        if (curRes == null)     // 첫 자원
         {
-            resource.gameObject.transform.SetParent(stack, true);
+            res.transform.SetParent(stack, true);
+            res.transform.position = stack.position;
+            res.transform.rotation = stack.rotation;
+            curRes = res;
 
-            //StartCoroutine(MoveToStack(resource));
-
-            resource.gameObject.transform.position = new Vector3(stack.position.x, stack.position.y, stack.position.z);
-            resource.gameObject.transform.rotation = stack.rotation;
-
-            if (resource.gameObject.GetComponent<Rigidbody>() != null)
-                resource.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-            num++;
-
-            curMeat = resource;
-        }
-        else if (num > 0 && resource != null)
-        {
-            resource.count = num;
-            resource.gameObject.transform.SetParent(curMeat.chain, true);
-
-            //StartCoroutine(MoveToStack(resource));
-
-            resource.gameObject.transform.position = new Vector3(curMeat.chain.position.x, curMeat.chain.position.y, curMeat.chain.position.z);
-            resource.gameObject.transform.rotation = curMeat.chain.rotation;
-
-            if (resource.gameObject.GetComponent<Rigidbody>() != null)
-                resource.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-            num++;
-
-            curMeat = resource;
-        }
-    }
-
-    public void StackCash(Resource cash)
-    {
-        Transform stack = stack2Tr;
-
-        if (cash == null) return;
-        
-        if (curCash == null)     // 첫 돈
-        {
-            cash.transform.SetParent(stack, true);
-            cash.transform.position = stack.position;
-            cash.transform.rotation = stack.rotation;
-            curCash = cash;
-
-           cashStack.Add(cash);
-           Debug.Log(cashStack.Count);
+            resStack.Add(res);
+            Debug.Log(resStack.Count);
+            if (res.gameObject.GetComponent<Rigidbody>() != null)
+                res.gameObject.GetComponent<Rigidbody>().isKinematic = true;
             return;
         }
 
-        cash.transform.SetParent(curCash.chain, true);
-        cash.transform.position = curCash.chain.position;
-        cash.transform.rotation = curCash.chain.rotation;
-        curCash = cash;
-        
-        cashStack.Add(cash);
+        res.transform.SetParent(curRes.chain, true);
+        res.transform.position = curRes.chain.position;
+        res.transform.rotation = curRes.chain.rotation;
+        curRes = res;
 
-        Debug.Log(cashStack.Count);
+        resStack.Add(res);
+
+        if (res.gameObject.GetComponent<Rigidbody>() != null)
+            res.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+
     }
 
 
     bool StopToWall()
     {
-        //Debug.DrawRay(transform.position, transform.forward * 5, Color.green);
         return Physics.Raycast(transform.position + transform.up, transform.forward, 3, LayerMask.GetMask("Structure"));
-    }
-
-    public IEnumerable<Resource> EnumerateBackpackTopDown()
-    {
-        Transform cursor = stack1Tr;           // 첫 고기가 붙어 있는 위치
-        while (cursor.childCount > 0)
-        {
-            var child = cursor.GetChild(0);
-            var res = child.GetComponent<Resource>();
-            if (res == null) yield break;
-
-            yield return res;                  // 위 → 아래
-            cursor = res.chain;               // 다음 고기의 부모 지점
-        }
     }
 
     public void ClearBackpackState(Resource curResource)
     {
-        num = 0;        // 스택 카운터 초기화
-        curResource = null; // 마지막 고기 참조 해제
+        // num = 0;        // 스택 카운터 초기화
+        curResource = null; // 마지막 자원 참조 해제
     }
-
-    public Resource GetCurMeat()
+    public Resource GetCurResource()
     {
-        return curMeat;
-    }
-    public Resource GetCurCash()
-    {
-        return curCash;
+        Debug.Log("현재 자원 : " + curRes.name);
+        return curRes;
     }
 
     public Animator SetAnim()
@@ -293,7 +205,6 @@ public class Player : MonoBehaviour
 
     public bool OnSight()
     {
-        Debug.DrawRay(transform.position, transform.forward * 20 + Vector3.up, Color.red);
         return Physics.Raycast(transform.position + transform.up, transform.forward, 20, LayerMask.GetMask("ENEMY"));
     }
 

@@ -26,48 +26,10 @@ public class WeaponShop : MonoBehaviour
     {
         if(col.CompareTag("Player"))
         {
-            Debug.Log("플레이어 접촉");
+            // Debug.Log("플레이어 접촉");
             if (col.TryGetComponent(out Player player))
             {
-                if (player.cashStack.Count > 0)
-                {
-                    last = player.cashStack.Count - 1;
-                    if (player.cashStack[last].gameObject == null)
-                    {
-                        player.cashStack.RemoveAt(last);
-                        return;
-                    }
-                }
-                
-                Debug.Log("플레이어 컴포넌트 확인");
-                if(player.cashStack == null)
-                    return;
-
-
-
-                if (player.cashStack != null && player.cashStack.Count > 0)
-                {
-                    Debug.Log("돈 지불");
-                    if (Time.time >= nextTerm)
-                    {
-                        Debug.Log(player.cashStack.Count - 1);
-
-                        //player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
-                        Destroy(player.cashStack[player.cashStack.Count - 1].gameObject);
-                        player.cashStack.RemoveAt(player.cashStack.Count - 1);
-                        player.ClearBackpackState(player.GetCurCash());
-
-                        curCash -= payment;
-
-                        if (curCash == 0)
-                        {
-                            UpgradeWeapon(player);
-                        }
-                        UpdateText(curCash);
-                        
-                        nextTerm = Time.time + term;
-                    }
-                }
+                Pay(player);
             }
         }
     }
@@ -100,6 +62,50 @@ public class WeaponShop : MonoBehaviour
                 player.SetAnim().SetBool("Axe", false);
                 player.SetAnim().SetBool("CrossBow", true);
                 player.EquipWeapon(player.weapons[weaponLevel - 1]); break;
+        }
+    }
+
+    private void Pay(Player player)
+    {
+        if (player.cashStack.Count > 0)
+        {
+            last = player.cashStack.Count - 1;
+            if (player.cashStack[last].gameObject == null)
+            {
+                player.cashStack.RemoveAt(last);
+                return;
+            }
+        }
+
+        //Debug.Log("플레이어 컴포넌트 확인");
+        if (player.cashStack == null)
+            return;
+
+
+
+        if (player.cashStack != null && player.cashStack.Count > 0)
+        {
+            //Debug.Log("돈 지불");
+            if (Time.time >= nextTerm)
+            {
+                Debug.Log(player.cashStack.Count - 1);
+
+                //player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
+                Destroy(player.cashStack[player.cashStack.Count - 1].gameObject);
+                player.cashStack.RemoveAt(player.cashStack.Count - 1);
+                
+                // player.ClearBackpackState(player.GetCurResource());
+
+                curCash -= payment;
+
+                if (curCash == 0)
+                {
+                    UpgradeWeapon(player);
+                }
+                UpdateText(curCash);
+
+                nextTerm = Time.time + term;
+            }
         }
     }
 }
