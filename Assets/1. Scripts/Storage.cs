@@ -2,10 +2,12 @@ using Mono.Cecil;
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Unity.Cinemachine;
 using Unity.VisualScripting;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Storage : MonoBehaviour
 {
@@ -34,27 +36,6 @@ public class Storage : MonoBehaviour
             stacks[i] = new List<Resource>();
     }
 
-    //void OnTriggerEnter(Collider col)
-    //{
-    //    if(col.CompareTag("Player"))
-    //    {
-    //        if (col.TryGetComponent(out Player player))
-    //        {
-
-    //        }
-
-    //            //StartCoroutine(Unload(player));
-    //    }
-    //}
-
-    //void OnTriggerExit(Collider col)
-    //{
-    //    if(col.TryGetComponent(out Player player))
-    //    {
-    //        //StopCoroutine(Unload(player));
-    //        player.ClearBackpackState(player.GetCurMeat());
-    //    }
-    //}
 
     private void OnTriggerStay(Collider col)
     {
@@ -89,30 +70,33 @@ public class Storage : MonoBehaviour
             {
                 Debug.Log(player.meatStack.Count - 1);
 
-                //player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
                 ReStackMeat(player.meatStack[player.meatStack.Count - 1]);
                 
-                //Destroy(player.meatStack[player.meatStack.Count - 1].gameObject);
                 player.meatStack.RemoveAt(player.meatStack.Count - 1);
-                
-                // player.ClearBackpackState(player.GetCurResource());
+
+                player.PlayClip(2);
 
                 nextTerm = Time.time + term;
             }
         }
     }
 
-    void ReStackMeat(Resource res)
+    void ReStackMeat(Resource meat)
     {
         Transform anchor = nextAnchor[addCursor];
 
-        res.transform.SetParent(anchor, true);
-        res.transform.localPosition = Vector3.zero;
-        res.transform.localRotation = Quaternion.identity;
+        meat.transform.SetParent(anchor, true);
+        meat.transform.localPosition = Vector3.zero;
+        meat.transform.localRotation = Quaternion.identity;
 
-        stacks[addCursor].Add(res);
-        nextAnchor[addCursor] = res.chain;
-        meatCount++;
+        if (meat.GetComponent<Rigidbody>() != null)
+            meat.GetComponent<Rigidbody>().isKinematic = true;
+
+        if (meat.GetComponent<BoxCollider>() != null)
+            meat.GetComponent<BoxCollider>().enabled = false;
+
+        stacks[addCursor].Add(meat);
+        nextAnchor[addCursor] = meat.chain;
 
         addCursor = (addCursor + 1) % slots.Length;
     }
@@ -132,6 +116,11 @@ public class Storage : MonoBehaviour
         int checkedSlots = 0;
         while (checkedSlots < slots.Length)
         {
+            List<Resource> stack = stacks[removeCursor];
+
+            while (stack.Count > 0 && stack[^1] == null)
+                stack.RemoveAt(stack.Count - 1);
+
             if (stacks[removeCursor].Count > 0)
             {
                 int last = stacks[removeCursor].Count - 1;
@@ -149,14 +138,13 @@ public class Storage : MonoBehaviour
 
                 meat.transform.SetParent(null);
                 meat.gameObject.SetActive(false);
-                Destroy(meat.gameObject);
+
 
                 meatCount--;
                 removeCursor = (removeCursor + 1) % stacks.Length;
                 return true;
             }
 
-            // 현재 칸이 비었으면 다음 칸 검사
             removeCursor = (removeCursor + 1) % stacks.Length;
             checkedSlots++;
         }

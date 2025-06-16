@@ -83,7 +83,7 @@ public class CashSafe : MonoBehaviour
             if(col.TryGetComponent(out Player player) && TryPopCash(out Resource cash))
             {
                 cash.gameObject.SetActive(true);
-                player.StackResource(cash, player.stack2Tr, player.cashStack);
+                player.StackResource(cash, false);
             }
         }
     }

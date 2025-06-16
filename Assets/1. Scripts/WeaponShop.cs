@@ -15,6 +15,7 @@ public class WeaponShop : MonoBehaviour
     private int weaponLevel = 1;
     private int last = 0;
 
+
     private void Start()
     {
         curCash = requiredCash;
@@ -56,11 +57,11 @@ public class WeaponShop : MonoBehaviour
         switch(weaponLevel)
         {
             case 1 : 
-                player.SetAnim().SetBool("Axe", true);
-                player.SetAnim().SetBool("CrossBow", false); break;
+                player.GetAnim().SetBool("Axe", true);
+                player.GetAnim().SetBool("CrossBow", false); break;
             case 2:
-                player.SetAnim().SetBool("Axe", false);
-                player.SetAnim().SetBool("CrossBow", true);
+                player.GetAnim().SetBool("Axe", false);
+                player.GetAnim().SetBool("CrossBow", true);
                 player.EquipWeapon(player.weapons[weaponLevel - 1]); break;
         }
     }
@@ -90,8 +91,9 @@ public class WeaponShop : MonoBehaviour
             {
                 Debug.Log(player.cashStack.Count - 1);
 
-                //player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
-                Destroy(player.cashStack[player.cashStack.Count - 1].gameObject);
+                player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
+                player.cashStack[player.cashStack.Count - 1].gameObject.SetActive(false);
+                //Destroy(player.cashStack[player.cashStack.Count - 1].gameObject);
                 player.cashStack.RemoveAt(player.cashStack.Count - 1);
                 
                 // player.ClearBackpackState(player.GetCurResource());
@@ -103,6 +105,7 @@ public class WeaponShop : MonoBehaviour
                     UpgradeWeapon(player);
                 }
                 UpdateText(curCash);
+                player.PlayClip(3);
 
                 nextTerm = Time.time + term;
             }

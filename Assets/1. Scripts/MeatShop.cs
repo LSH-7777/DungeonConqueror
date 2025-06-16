@@ -84,9 +84,10 @@ public class MeatShop : MonoBehaviour
             {
                 front.BuyMeatAnimation(true); // 구매 요청 애니메이션
 
-                if (storage.TryPopMeat(out var meat))
+                if (storage.TryPopMeat(out Resource meat))
                 {
-                    front.ReceiveMeat(meat);        // NPC 애니메이션·카운트 증가
+                    if(meat != null)
+                        front.ReceiveMeat(meat);        // NPC 애니메이션·카운트 증가
                     
                     yield return new WaitForSeconds(term);
                 }

@@ -15,14 +15,12 @@ public class Player : MonoBehaviour
     public GameObject stack2;
 
     [HideInInspector]
-    public Transform stack1Tr;
-    [HideInInspector]
-    public Transform stack2Tr;
+    public Transform stack1Tr, stack2Tr;
 
     private Resource curRes;
 
     private Resource meat;
-    private Resource curMeat;
+    private Resource meatTop, cashTop;
 
     private Resource cash;
     private Resource curCash;
@@ -34,16 +32,22 @@ public class Player : MonoBehaviour
     private float distance;
     private readonly float term = 0.05f;
     private float nextTerm = 0f;
+    
+    private AudioSource audioSource;
 
     public List<Resource> meatStack = new List<Resource>();
     public List<Resource> cashStack = new List<Resource>();
 
     public GameObject[] weapons;
+
+    public AudioClip[] resClip;
+
     private void Start()
     {
         stack1Tr = stack1.transform;
         stack2Tr = stack2.transform;
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
         animator.SetBool("Axe", true);
         EquipWeapon(weapons[0]);
     }
@@ -103,7 +107,7 @@ public class Player : MonoBehaviour
             
             if(Time.time >= nextTerm)
             {
-                StackResource(meat, stack1Tr, meatStack);
+                StackResource(meat, true);
                 nextTerm = Time.time + term;
             }
         }
@@ -151,33 +155,51 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void StackResource(Resource res, Transform stack, List<Resource> resStack)
+    public void StackResource(Resource res, bool isMeat)
     {
         if (res == null) return;
+        
+        List<Resource> stack;
+        Transform anchor;
 
-        if (curRes == null)     // 첫 자원
+        if(isMeat)
         {
-            res.transform.SetParent(stack, true);
-            res.transform.position = stack.position;
-            res.transform.rotation = stack.rotation;
-            curRes = res;
-
-            resStack.Add(res);
-            Debug.Log(resStack.Count);
-            if (res.gameObject.GetComponent<Rigidbody>() != null)
-                res.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-            return;
+           stack = meatStack;
+           PlayClip(0);
+        }
+        else
+        {
+           stack = cashStack;
+           PlayClip(1);
         }
 
-        res.transform.SetParent(curRes.chain, true);
-        res.transform.position = curRes.chain.position;
-        res.transform.rotation = curRes.chain.rotation;
-        curRes = res;
+        if(stack.Count > 0)
+            anchor = stack[^1].chain; // ^1 : 끝에서 첫번째
+        else
+        {
+            if(isMeat)
+                anchor = stack1Tr;
+            else
+                anchor = stack2Tr;
+        }
 
-        resStack.Add(res);
 
-        if (res.gameObject.GetComponent<Rigidbody>() != null)
-            res.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+        res.transform.SetParent(anchor, true);
+        res.transform.localPosition = Vector3.zero;
+        res.transform.localRotation = Quaternion.identity;
+
+        if(res.GetComponent<Rigidbody>() != null)
+            res.GetComponent<Rigidbody>().isKinematic = true;
+        
+        if(res.GetComponent<BoxCollider>() != null)
+            res.GetComponent<BoxCollider>().enabled = false;
+
+            stack.Add(res);
+        
+        if (isMeat)
+            meatTop = res;
+        else
+            cashTop = res;
 
     }
 
@@ -187,20 +209,13 @@ public class Player : MonoBehaviour
         return Physics.Raycast(transform.position + transform.up, transform.forward, 3, LayerMask.GetMask("Structure"));
     }
 
-    public void ClearBackpackState(Resource curResource)
-    {
-        // num = 0;        // 스택 카운터 초기화
-        curResource = null; // 마지막 자원 참조 해제
-    }
-    public Resource GetCurResource()
-    {
-        Debug.Log("현재 자원 : " + curRes.name);
-        return curRes;
-    }
-
-    public Animator SetAnim()
+    public Animator GetAnim()
     {
         return animator;
+    }
+    public void PlayClip(int idx)
+    {
+        audioSource.PlayOneShot(resClip[idx], 0.3f);
     }
 
     public bool OnSight()

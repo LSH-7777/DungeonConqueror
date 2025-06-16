@@ -20,7 +20,7 @@ public class CrossBow : Weapon
     {
         if (owner.OnSight() == true)
         {
-            owner.SetAnim().SetBool("OnSight", true);
+            owner.GetAnim().SetBool("OnSight", true);
         }
 
         return Physics.Raycast(transform.position + transform.up, transform.forward, 15, LayerMask.GetMask("ENEMY"));
@@ -32,12 +32,12 @@ public class CrossBow : Weapon
 
         if(AimEnemy() == true)
         {
-            owner.SetAnim().SetBool("Attack", true);
+            owner.GetAnim().SetBool("Attack", true);
 
         }
         else
         {
-            owner.SetAnim().SetBool("Attack", false);
+            owner.GetAnim().SetBool("Attack", false);
         }
     }
     public void Fire()

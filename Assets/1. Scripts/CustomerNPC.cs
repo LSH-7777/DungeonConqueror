@@ -137,6 +137,8 @@ public class CustomerNPC : MonoBehaviour
     }
     public void ReceiveMeat(Resource m)
     { 
+        if(m == null) return;
+
         curMeat++;
         progress.value = (float)curMeat / MaxMeat;
     }
