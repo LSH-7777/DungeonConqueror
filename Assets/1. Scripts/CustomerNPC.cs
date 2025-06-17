@@ -128,7 +128,7 @@ public class CustomerNPC : MonoBehaviour
         animator.SetBool("isMove", false);
 
         // 외부에 알림
-        OnArrivedSpot?.Invoke(this);
+        //OnArrivedSpot?.Invoke(this);
     }
 
     public bool NeedMoreMeat()

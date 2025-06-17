@@ -1,42 +1,63 @@
 using UnityEngine;
+using UnityEngine.AI;
 
 public class MonsterAI : MonoBehaviour
 {
     private Transform player;
     private Animator anim;
 
-    private SphereCollider detectionRange;
+    private float detectionRange = 15f;
     private float distance;
 
-    public float attackRange = 0.5f;
-    
+    private NavMeshAgent agent;
+
+    public float attackRange = 1.0f;
+    public float damage = 1f;
+    public float stopDistance = 1.0f;
+
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        detectionRange = GetComponent<SphereCollider>();
+        agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
     }
 
-    private void OnTriggerEnter(Collider other)
+    void Update()
     {
-        anim.SetBool("Chase", other.gameObject.CompareTag("Player"));
-    }
-    private void OnTriggerStay(Collider other)
-    {
-        if(other.CompareTag("Player"))
+        distance = Vector3.Distance(transform.position, player.position);
+
+        if (distance <= detectionRange)
         {
             LookAtPlayer();
-            AttackPlayer();
-        }
-    }
 
-    private void OnTriggerExit(Collider other)
-    {
-        anim.SetBool("Chase", false);
-        anim.SetBool("ATTACK", false);
+            if (distance > stopDistance)
+            {
+                ChasePlayer();
+            }
+            else
+            {
+                anim.SetBool("Chase", false);
+                agent.SetDestination(transform.position);
+            }
+
+            if (distance <= attackRange)
+            {
+                AttackPlayer();
+            }
+            else
+            {
+                anim.SetBool("ATTACK", false);
+            }
+        }
+        else
+        {
+            anim.SetBool("ATTACK", false);
+            anim.SetBool("Chase", false);
+            agent.SetDestination(transform.position);
+        }
     }
 
     protected void LookAtPlayer()
@@ -51,11 +72,14 @@ public class MonsterAI : MonoBehaviour
     }
     void AttackPlayer()
     {
-        distance = Vector3.Distance(player.position, transform.position);
+       anim.SetBool("ATTACK", true);
+       anim.SetBool("Chase", false);
+    }
 
-        if (distance <= attackRange)
-        {
-            anim.SetBool("ATTACK", true);
-        }
+    void ChasePlayer()
+    {
+        anim.SetBool("Chase", true);
+        anim.SetBool("ATTACK", false);
+        agent.SetDestination(player.position);
     }
 }
