@@ -74,6 +74,8 @@ public class MeatShop : MonoBehaviour
 
             CustomerNPC front = line.Peek();        // 맨 앞
             
+            bool needCooked = front is CustomerNPC_Cooked; // 조리된 고기를 구매하는 NPC 확인
+            
             if (!front.HasArrived()) // 도착 확인 
             { 
                 yield return null;
@@ -84,7 +86,7 @@ public class MeatShop : MonoBehaviour
             {
                 front.BuyMeatAnimation(true); // 구매 요청 애니메이션
 
-                if (storage.TryPopMeat(out Resource meat))
+                if (storage.TryPopMeat(needCooked, out Resource meat))
                 {
                     if(meat != null)
                         front.ReceiveMeat(meat);        // NPC 애니메이션·카운트 증가

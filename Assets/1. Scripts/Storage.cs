@@ -11,10 +11,14 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Storage : MonoBehaviour
 {
-    [SerializeField] Transform[] slots = new Transform[4];   // 1~4
-    Transform[] nextAnchor;   // 슬롯별 "다음 붙일 곳"
+    [SerializeField] Transform[] slotsRaw;
+    [SerializeField] Transform[] slotsCook;
 
-    List<Resource>[] stacks = new List<Resource>[4];
+    Transform[] nextAnchorRaw;   // 슬롯별 "다음 붙일 곳"
+    Transform[] nextAnchorCook;
+
+    List<Resource>[] stacksRaw = new List<Resource>[4];
+    List<Resource>[] stacksCook = new List<Resource>[4];
 
     int addCursor = 0;           // 현재 사용할 슬롯 인덱스
     int removeCursor = 0;
@@ -27,13 +31,44 @@ public class Storage : MonoBehaviour
 
     void Awake()
     {
-        nextAnchor = new Transform[4];
-        
-        for (int i = 0; i < 4; i++) 
-            nextAnchor[i] = slots[i];
+        int rawLen;
 
-        for (int i = 0; i < 4; i++)
-            stacks[i] = new List<Resource>();
+        if(slotsRaw != null)
+        {
+            rawLen = slotsRaw.Length;
+        }
+        else
+        {
+            rawLen = 0;
+        }
+
+        nextAnchorRaw = new Transform[rawLen];
+        stacksRaw = new List<Resource>[rawLen];
+
+        for (int i = 0; i < rawLen; i++)
+        {
+            nextAnchorRaw[i] = slotsRaw[i];
+            stacksRaw[i] = new List<Resource>();
+        }
+
+        int cookLen;
+        if (slotsCook != null)
+        {
+            cookLen = slotsCook.Length;
+        }
+        else
+        {
+            cookLen = 0;
+        }
+
+        nextAnchorCook = new Transform[cookLen];
+        stacksCook = new List<Resource>[cookLen];
+            
+        for (int i = 0; i < cookLen; i++)
+        {
+            nextAnchorCook[i] = slotsCook[i];
+            stacksCook[i] = new List<Resource>();
+        }
     }
 
 
@@ -50,9 +85,11 @@ public class Storage : MonoBehaviour
 
     private void UnloadMeat(Player player)
     {
+
         if (player.meatStack.Count > 0)
         {
             last = player.meatStack.Count - 1;
+
             if (player.meatStack[last].gameObject == null)
             {
                 player.meatStack.RemoveAt(last);
@@ -64,14 +101,11 @@ public class Storage : MonoBehaviour
             return;
 
 
-        if (player.meatStack != null && player.meatStack.Count > 0)
+            if (player.meatStack != null && player.meatStack.Count > 0)
         {
             if (Time.time >= nextTerm)
             {
-                Debug.Log(player.meatStack.Count - 1);
-
-                ReStackMeat(player.meatStack[player.meatStack.Count - 1]);
-                
+                ReStackMeat(player.meatStack[^1]);
                 player.meatStack.RemoveAt(player.meatStack.Count - 1);
 
                 player.PlayClip(2);
@@ -83,7 +117,13 @@ public class Storage : MonoBehaviour
 
     void ReStackMeat(Resource meat)
     {
-        Transform anchor = nextAnchor[addCursor];
+        bool cooked = meat.state == Resource.meatState.Cooked;
+
+        List<Resource>[] stacks = cooked ? stacksCook : stacksRaw;
+        Transform[] nextAnchor = cooked ? nextAnchorCook : nextAnchorRaw;
+        Transform[] slots = cooked ? slotsCook : slotsRaw;
+
+       Transform anchor = nextAnchor[addCursor];
 
         meat.transform.SetParent(anchor, true);
         meat.transform.localPosition = Vector3.zero;
@@ -111,8 +151,14 @@ public class Storage : MonoBehaviour
         meatCount = count;
     }
 
-    public bool TryPopMeat(out Resource meat)
+    public bool TryPopMeat(bool cooked, out Resource meat)
     {
+ 
+        List<Resource>[] stacks = cooked ? stacksCook : stacksRaw;
+        Transform[] nextAnchor = cooked ? nextAnchorCook : nextAnchorRaw;
+        Transform[] slots = cooked ? slotsCook : slotsRaw;
+
+
         int checkedSlots = 0;
         while (checkedSlots < slots.Length)
         {
@@ -151,5 +197,11 @@ public class Storage : MonoBehaviour
 
         meat = null;
         return false;   // 창고에 고기가 없음
+    }
+
+    public bool CheckMeat(out Resource food, bool isCooked)
+    {
+        food = null;
+        return false;
     }
 }
