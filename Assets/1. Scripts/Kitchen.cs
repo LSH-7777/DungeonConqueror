@@ -53,7 +53,7 @@ public class Kitchen : MonoBehaviour
     {
         while (true)
         {
-            if (storage.TryPopMeat(out Resource meat))
+            if (storage.TryPopMeat(false, out Resource meat))
             {
                 if (meat != null)
                 {
@@ -85,6 +85,8 @@ public class Kitchen : MonoBehaviour
         Debug.Log("Cook!");
         Resource cookedSteak = Instantiate(steakObject, transform.position, transform.rotation).GetComponent<Resource>();
         
+        cookedSteak.state = Resource.meatState.Cooked;
+
         AddFood(cookedSteak);
     }
 
@@ -119,6 +121,50 @@ public class Kitchen : MonoBehaviour
         {
             audioSource.Stop();
             playEffect = cooking;
+        }
+    }
+
+    public bool TryPopSteak(out Resource cookedMeat)
+    {
+        int checkedSlots = 0;
+        while (checkedSlots < slots.Length)
+        {
+            if (stacks[removeCursor].Count > 0)
+            {
+                int last = stacks[removeCursor].Count - 1;
+                cookedMeat = stacks[removeCursor][last];
+                stacks[removeCursor].RemoveAt(last);
+
+                nextAnchor[removeCursor] = (stacks[removeCursor].Count == 0)
+                                            ? slots[removeCursor] : stacks[removeCursor][stacks[removeCursor].Count - 1].chain;
+
+
+                cookedMeat.transform.SetParent(null);
+                cookedMeat.gameObject.SetActive(false);
+
+                steakCount--;
+                removeCursor = (removeCursor + 1) % stacks.Length;
+
+                return true;
+            }
+            removeCursor = (removeCursor + 1) % stacks.Length;
+            checkedSlots++;
+        }
+
+        cookedMeat = null;
+        return false;
+    }
+
+
+    private void OnTriggerStay(Collider col)
+    {
+        if (col.CompareTag("Player"))
+        {
+            if (col.TryGetComponent(out Player player) && TryPopSteak(out Resource cookedMeat))
+            {
+                cookedMeat.gameObject.SetActive(true);
+                player.StackResource(cookedMeat, true);
+            }
         }
     }
 }

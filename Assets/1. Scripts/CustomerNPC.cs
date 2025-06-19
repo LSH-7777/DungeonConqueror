@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class CustomerNPC : MonoBehaviour
 {
-    private MeatShop meatShop;
+    protected MeatShop meatShop;
     private GameObject meatShopLine;
     
     private GameObject waypoint;
@@ -131,11 +131,11 @@ public class CustomerNPC : MonoBehaviour
         //OnArrivedSpot?.Invoke(this);
     }
 
-    public bool NeedMoreMeat()
+    public virtual bool NeedMoreMeat()
     {
         return curMeat < MaxMeat;
     }
-    public void ReceiveMeat(Resource m)
+    public virtual void ReceiveMeat(Resource m)
     { 
         if(m == null) return;
 
@@ -153,7 +153,7 @@ public class CustomerNPC : MonoBehaviour
         animator.SetBool("Buy", isBuying);
     }
 
-    public void GiveMoney()
+    public virtual void GiveMoney()
     {
         Vector3 spwanPos = transform.position + transform.forward * 0.2f + Vector3.up * 1.0f;
         Resource cash = Instantiate(cashObject, spwanPos, transform.rotation).GetComponent<Resource>();

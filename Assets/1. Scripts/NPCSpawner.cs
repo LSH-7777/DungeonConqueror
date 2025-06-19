@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class NPCSpawner : MonoBehaviour
 {
-    public GameObject CustomerNPC;
+    public GameObject[] CustomerNPCs;
     public Transform NPCSpawnPoint;
 
     private MeatShop meatShop;
@@ -31,7 +31,7 @@ public class NPCSpawner : MonoBehaviour
             if(meatShop.waypoints.Length > GetSpawnCount(npc))
             {
                 //Instantiate(CustomerNPC, NPCSpawnPoint.position, NPCSpawnPoint.rotation);
-                npc = Instantiate(CustomerNPC, NPCSpawnPoint.position, NPCSpawnPoint.rotation).GetComponent<CustomerNPC>();
+                npc = Instantiate(FindCustomer(), NPCSpawnPoint.position, NPCSpawnPoint.rotation).GetComponent<CustomerNPC>();
                 meatShop.AddNPC(npc);
             }
             yield return new WaitForSeconds(0.75f);
@@ -41,5 +41,21 @@ public class NPCSpawner : MonoBehaviour
     {
         spawnCount = FindObjectsOfType<CustomerNPC>().Length;
         return spawnCount;
+    }
+
+    public GameObject FindCustomer()
+    {
+        GameObject npc = null;
+        float select = Random.Range(0f, 1f);
+
+        if(select <= 0.8)
+        {
+            npc = CustomerNPCs[0];
+        }
+        else
+        {
+            npc = CustomerNPCs[1];
+        }
+        return npc;
     }
 }
