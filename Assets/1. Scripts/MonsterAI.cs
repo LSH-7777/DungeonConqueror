@@ -6,7 +6,7 @@ public class MonsterAI : MonoBehaviour
     private Transform player;
     private Animator anim;
 
-    private float detectionRange = 15f;
+    private float detectionRange = 20f;
     private float distance;
 
     private NavMeshAgent agent;
@@ -72,12 +72,14 @@ public class MonsterAI : MonoBehaviour
     }
     void AttackPlayer()
     {
+       // Debug.Log(distance);
        anim.SetBool("ATTACK", true);
        anim.SetBool("Chase", false);
     }
 
     void ChasePlayer()
     {
+        //Debug.Log(distance);
         anim.SetBool("Chase", true);
         anim.SetBool("ATTACK", false);
         agent.SetDestination(player.position);

@@ -104,7 +104,7 @@ public class Player : MonoBehaviour
         else if(col.CompareTag("MEAT"))
         {
             meat = col.GetComponent<Resource>();
-            
+            Debug.Log("고기!");
             if(Time.time >= nextTerm)
             {
                 StackResource(meat, true);

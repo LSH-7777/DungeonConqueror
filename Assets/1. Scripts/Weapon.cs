@@ -7,16 +7,31 @@ public class Weapon : MonoBehaviour
 
     protected Player owner;
 
+    float term = 1f;
+    float nextTerm = 0f;
+
     public void SetOwner(Player player)
     {
         this.owner = player;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision col)
     {
-        if(collision.gameObject.CompareTag("ENEMY"))
+        if(col.gameObject.CompareTag("ENEMY"))
         {
             Attack();
+        }
+    }
+
+    private void OnCollisionStay(Collision col)
+    {
+        if(Time.time >= nextTerm)
+        {
+            if (col.gameObject.CompareTag("ENEMY"))
+            {
+                Attack();
+                nextTerm = Time.time + term;
+            }
         }
     }
 
@@ -28,6 +43,7 @@ public class Weapon : MonoBehaviour
             if (hitCollider.CompareTag("ENEMY"))
             {
                 Monster monster = hitCollider.GetComponent<Monster>();
+                Debug.Log(monster);
                 if (monster != null)
                 {
                     float damage = attackPower;
