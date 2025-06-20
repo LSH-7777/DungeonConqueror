@@ -5,10 +5,10 @@ public class Resource : MonoBehaviour
     public Transform chain;
     public int count;
 
-    public enum meatState
+    public enum State
     {
-        Raw, Cooked
+        Raw, Cooked, Cash
     }
-    public meatState state = meatState.Raw;
+    public State state = State.Raw;
 
 }

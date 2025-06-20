@@ -22,7 +22,7 @@ public class Kitchen : MonoBehaviour
     public Transform[] slots = new Transform[2];
     public Storage storage;
     
-    public Resource steak;
+    //public Resource steak;
     public GameObject steakObject;
 
     public GameObject[] cookEffects;
@@ -85,7 +85,7 @@ public class Kitchen : MonoBehaviour
         Debug.Log("Cook!");
         Resource cookedSteak = Instantiate(steakObject, transform.position, transform.rotation).GetComponent<Resource>();
         
-        cookedSteak.state = Resource.meatState.Cooked;
+        cookedSteak.state = Resource.State.Cooked;
 
         AddFood(cookedSteak);
     }

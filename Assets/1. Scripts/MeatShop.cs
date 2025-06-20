@@ -72,8 +72,9 @@ public class MeatShop : MonoBehaviour
             }
 
 
-            CustomerNPC front = line.Peek();        // 맨 앞
-            
+            CustomerNPC front = line.Peek(); // 맨 앞
+            Debug.Log(front.name);
+
             bool needCooked = front is CustomerNPC_Cooked; // 조리된 고기를 구매하는 NPC 확인
             
             if (!front.HasArrived()) // 도착 확인 

@@ -23,7 +23,7 @@ public class CrossBow : Weapon
             owner.GetAnim().SetBool("OnSight", true);
         }
 
-        return Physics.Raycast(transform.position + transform.up, transform.forward, 15, LayerMask.GetMask("ENEMY"));
+        return Physics.Raycast(transform.position + transform.up, transform.forward, 25, LayerMask.GetMask("ENEMY"));
     }
 
 

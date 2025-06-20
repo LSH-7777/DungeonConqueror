@@ -35,17 +35,18 @@ public class CustomerNPC : MonoBehaviour
     {
         meatShopLine = GameObject.Find("MeatShop");
         agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+        meatShop = meatShopLine.GetComponent<MeatShop>();
+
     }
 
     void Start()
     {
-        meatShop = meatShopLine.GetComponent<MeatShop>();
-        animator = GetComponent<Animator>();
-
         if (meatShop.waypoints.Length > 0)
         {
             SetNextDestination();
         }
+        progress.value = (float)curMeat / MaxMeat;
     }
 
     void Update()
@@ -56,9 +57,9 @@ public class CustomerNPC : MonoBehaviour
     // 현재 currentIndex에 해당하는 웨이포인트로 경로 설정
     public void SetNextDestination()
     {
-        int idx = (meatShop.waypoints.Length - 1) - currentIndex;
+        int idx = currentIndex;
         
-        agent.SetDestination(meatShop.waypoints[idx].position);
+        agent.SetDestination(meatShop.waypoints[idx ].position);
         animator.SetBool("isMove", true);
 
         // 새로운 목표로 이동할 때마다 도착 감시 시작
@@ -158,6 +159,8 @@ public class CustomerNPC : MonoBehaviour
         Vector3 spwanPos = transform.position + transform.forward * 0.2f + Vector3.up * 1.0f;
         Resource cash = Instantiate(cashObject, spwanPos, transform.rotation).GetComponent<Resource>();
         
+        cash.state = Resource.State.Cash;
+
         meatShop.cashSafe.AddCash(cash);
     }
 }

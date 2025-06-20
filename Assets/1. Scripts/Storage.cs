@@ -101,7 +101,7 @@ public class Storage : MonoBehaviour
             return;
 
 
-            if (player.meatStack != null && player.meatStack.Count > 0)
+        if (player.meatStack != null && player.meatStack.Count > 0)
         {
             if (Time.time >= nextTerm)
             {
@@ -117,7 +117,7 @@ public class Storage : MonoBehaviour
 
     void ReStackMeat(Resource meat)
     {
-        bool cooked = meat.state == Resource.meatState.Cooked;
+        bool cooked = meat.state == Resource.State.Cooked;
 
         List<Resource>[] stacks = cooked ? stacksCook : stacksRaw;
         Transform[] nextAnchor = cooked ? nextAnchorCook : nextAnchorRaw;
