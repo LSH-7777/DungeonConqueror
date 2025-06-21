@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 //using UnityEngine.UIElements;
 
@@ -18,6 +19,11 @@ public class Monster : MonoBehaviour
 
     private Vector3 scale;
 
+    private AudioSource audioSource;
+
+    public AudioClip hitClip;
+    public ParticleSystem hitEffect;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -32,18 +38,26 @@ public class Monster : MonoBehaviour
 
         curHP = maxHP;
         HPprogressBar.value = curHP / maxHP;
+
+        audioSource = GetComponent<AudioSource>();
     }
 
     public void UpdateProgressBar()
     {
-        if(HPprogressBar != null)
+        if(HPprogressBar != null && IsDead() == false)
         {
             HPprogressBar.value = curHP / maxHP;
+        }
+        else if(IsDead() == true)
+        {
+            MonsterAI.Dead();
         }
     }
 
     public void SpawnMeat(float damage)
     {
+        if (IsDead() == true) return;
+
         for(int i = 0; i < damage*1; i++)
         {
             // 생성된 고기를 참조하여 force를 더함
@@ -57,4 +71,31 @@ public class Monster : MonoBehaviour
         }
         
     }
+
+    public bool IsDead()
+    {
+        if(curHP <= 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    public void PlayHitEffect()
+    {
+        if (IsDead() == true)
+        {
+            return;
+        }
+
+        audioSource.PlayOneShot(hitClip, 0.1f);
+        // 파티클 효과 재생
+        if (hitEffect != null)
+        {
+            hitEffect.Play();
+        }
+    }
+
 }

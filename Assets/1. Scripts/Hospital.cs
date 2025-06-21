@@ -1,35 +1,29 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class WeaponShop : MonoBehaviour
+public class Hospital : MonoBehaviour
 {
     public Text CashText;
 
     private int curCash = 0;
-    private int requiredCash = 1000;
+    private int requiredCash = 500;
     private int payment = 100;
 
     private float term = 0.1f;
     private float nextTerm = 0f;
 
-    private int weaponLevel = 1;
     private int last = 0;
 
-    private AudioSource audioSource;
 
-    public AudioClip upgradeClip;
-    public ParticleSystem upgradeEffect;
     private void Start()
     {
         curCash = requiredCash;
         UpdateText(requiredCash);
-        audioSource = GetComponent<AudioSource>();
     }
-
 
     private void OnTriggerStay(Collider col)
     {
-        if(col.CompareTag("Player"))
+        if (col.CompareTag("Player"))
         {
             // Debug.Log("플레이어 접촉");
             if (col.TryGetComponent(out Player player))
@@ -39,40 +33,12 @@ public class WeaponShop : MonoBehaviour
         }
     }
 
-    void UpdateText(int curCash)
-    {
-        CashText.text = "남은 액수 : " + curCash.ToString() + " 원";
-    }
-
-    private void UpgradeWeapon(Player player)
-    {
-        if (weaponLevel > player.weapons.Length) return;
-
-        if (player.weapons[weaponLevel - 1].gameObject != null && player.weapons[weaponLevel].gameObject != null)
-        {
-            player.weapons[weaponLevel - 1].gameObject.SetActive(false);
-            player.weapons[weaponLevel].gameObject.SetActive(true);
-        }
-        weaponLevel++;
-        PlayUpgradeEffect();
-        requiredCash *= weaponLevel;
-
-        curCash = requiredCash;
-
-        switch(weaponLevel)
-        {
-            case 1 : 
-                player.GetAnim().SetBool("Axe", true);
-                player.GetAnim().SetBool("CrossBow", false); break;
-            case 2:
-                player.GetAnim().SetBool("Axe", false);
-                player.GetAnim().SetBool("CrossBow", true);
-                player.EquipWeapon(player.weapons[weaponLevel - 1]); break;
-        }
-    }
-
     private void Pay(Player player)
     {
+        PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+
+        if (!playerHealth.HealthCheck()) return;
+
         if (player.cashStack.Count > 0)
         {
             last = player.cashStack.Count - 1;
@@ -100,32 +66,25 @@ public class WeaponShop : MonoBehaviour
                 player.cashStack[player.cashStack.Count - 1].gameObject.SetActive(false);
                 //Destroy(player.cashStack[player.cashStack.Count - 1].gameObject);
                 player.cashStack.RemoveAt(player.cashStack.Count - 1);
-                
+
                 // player.ClearBackpackState(player.GetCurResource());
 
                 curCash -= payment;
+                player.PlayClip(3);
 
                 if (curCash == 0)
                 {
-                    UpgradeWeapon(player);
+                    playerHealth.Healing(playerHealth.GetMaxHealth());
+                    curCash = requiredCash;
                 }
                 UpdateText(curCash);
-                player.PlayClip(3);
-
                 nextTerm = Time.time + term;
             }
         }
     }
 
-    private void PlayUpgradeEffect()
+    void UpdateText(int curCash)
     {
-        // 사운드 재생
-        audioSource.PlayOneShot(upgradeClip);
-
-        // 파티클 효과 재생
-        if (upgradeEffect != null)
-        {
-            upgradeEffect.Play();
-        }
+        CashText.text = "남은 액수 : " + curCash.ToString() + " 원";
     }
 }

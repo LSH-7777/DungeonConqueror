@@ -23,13 +23,12 @@ public class CrossBow : Weapon
             owner.GetAnim().SetBool("OnSight", true);
         }
 
-        return Physics.Raycast(transform.position + transform.up, transform.forward, 25, LayerMask.GetMask("ENEMY"));
+        return Physics.Raycast(transform.position + transform.up, transform.forward, 40, LayerMask.GetMask("ENEMY"));
     }
 
 
     protected override void Attack()
     {
-
         if(AimEnemy() == true)
         {
             owner.GetAnim().SetBool("Attack", true);
@@ -42,6 +41,7 @@ public class CrossBow : Weapon
     }
     public void Fire()
     {
+        SlashEffect();
         Instantiate(arrow, spawnPos.position, spawnPos.rotation);
     }
 }

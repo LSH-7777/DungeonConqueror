@@ -39,7 +39,6 @@ public class Player : MonoBehaviour
     public List<Resource> cashStack = new List<Resource>();
 
     public GameObject[] weapons;
-
     public AudioClip[] resClip;
 
     private void Start()
@@ -206,6 +205,7 @@ public class Player : MonoBehaviour
 
     bool StopToWall()
     {
+
         return Physics.Raycast(transform.position + transform.up, transform.forward, 3, LayerMask.GetMask("Structure"));
     }
 
@@ -220,7 +220,11 @@ public class Player : MonoBehaviour
 
     public bool OnSight()
     {
-        return Physics.Raycast(transform.position + transform.up, transform.forward, 20, LayerMask.GetMask("ENEMY"));
+        if(Physics.Raycast(transform.position + transform.up, transform.forward, 20, LayerMask.GetMask("ENEMY")))
+            return true;
+        
+        else
+            return false;
     }
 
     public void RangeAttack()

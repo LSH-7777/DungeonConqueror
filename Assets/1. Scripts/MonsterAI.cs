@@ -1,15 +1,27 @@
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
+using System.Collections.Generic;
 
 public class MonsterAI : MonoBehaviour
 {
-    private Transform player;
+    private Transform playerTr;
+    private PlayerHealth playerHealth;
     private Animator anim;
+    private Monster monster;
+    private AudioSource audioSource;
 
     private float detectionRange = 20f;
     private float distance;
 
+    private bool isAttacking = false;
+
+    private float attackCooldown = 1f;
+    private float lastAttackTime;
+
     private NavMeshAgent agent;
+
+    public AudioClip attackClip;
 
     public float attackRange = 1.0f;
     public float damage = 1f;
@@ -20,17 +32,22 @@ public class MonsterAI : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;
+        monster = GetComponent<Monster>();
+        playerTr = GameObject.FindGameObjectWithTag("Player").transform;
+        playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
         agent = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        distance = Vector3.Distance(transform.position, player.position);
+        distance = Vector3.Distance(transform.position, playerTr.position);
 
-        if (distance <= detectionRange)
+        if (distance <= detectionRange && monster.IsDead() == false)
         {
+            if(playerHealth.PlayerDead() == true) return;
+            
             LookAtPlayer();
 
             if (distance > stopDistance)
@@ -54,17 +71,22 @@ public class MonsterAI : MonoBehaviour
         }
         else
         {
+
             anim.SetBool("ATTACK", false);
             anim.SetBool("Chase", false);
+
+            if (monster.IsDead() == true) return;
             agent.SetDestination(transform.position);
         }
     }
 
     protected void LookAtPlayer()
     {
-        if (player != null)
+        if (monster.IsDead() == true) return;
+
+        if (playerTr != null)
         {
-            Vector3 direction = player.position - transform.position;
+            Vector3 direction = playerTr.position - transform.position;
             direction.y = 0;
             Quaternion rotation = Quaternion.LookRotation(direction);
             transform.rotation = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * 5f);
@@ -72,16 +94,63 @@ public class MonsterAI : MonoBehaviour
     }
     void AttackPlayer()
     {
-       // Debug.Log(distance);
-       anim.SetBool("ATTACK", true);
-       anim.SetBool("Chase", false);
+        if (monster.IsDead() == true) return;
+
+        // Debug.Log(distance);
+        anim.SetBool("ATTACK", true);
+        anim.SetBool("Chase", false);
+
+        if (Time.time >= lastAttackTime + attackCooldown)
+        {
+            lastAttackTime = Time.time;
+            lastAttackTime = Time.time;
+            PlayerHealth playerHealth = playerTr.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+            }
+        }
+
+        AttackSound();
     }
 
     void ChasePlayer()
     {
+        if (monster.IsDead() == true) return;
+
         //Debug.Log(distance);
         anim.SetBool("Chase", true);
         anim.SetBool("ATTACK", false);
-        agent.SetDestination(player.position);
+        agent.SetDestination(playerTr.position);
+    }
+
+    public void Dead()
+    {
+        bool isDead = false;
+
+        if (monster.IsDead() == false) return;
+
+        if (monster.IsDead() == true && isDead == false)
+        {
+            agent.enabled = false;
+            anim.SetTrigger("Dead");
+            isDead = true;
+        }
+
+        Destroy(monster.gameObject, 5.0f);
+    }
+
+    void AttackSound()
+    {
+        if (!isAttacking)
+            StartCoroutine(PlayAttackSoundOnce());
+    }
+
+    IEnumerator PlayAttackSoundOnce()
+    {
+        isAttacking = true;
+        audioSource.PlayOneShot(attackClip);
+        yield return new WaitForSeconds(attackClip.length);
+        isAttacking = false;
     }
 }

@@ -22,6 +22,7 @@ public class Projectile : MonoBehaviour
                 monster.curHP -= damage;
                 monster.UpdateProgressBar();
                 monster.SpawnMeat(damage);
+                monster.PlayHitEffect();
             }
             Destroy(gameObject);
         }
