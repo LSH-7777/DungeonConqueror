@@ -29,7 +29,7 @@ public class CrossBow : Weapon
 
     protected override void Attack()
     {
-        if(AimEnemy() == true)
+        if (AimEnemy() == true)
         {
             owner.GetAnim().SetBool("Attack", true);
 

@@ -17,6 +17,12 @@ public class Player : MonoBehaviour
     [HideInInspector]
     public Transform stack1Tr, stack2Tr;
 
+    public List<Resource> meatStack = new List<Resource>();
+    public List<Resource> cashStack = new List<Resource>();
+
+    public GameObject[] weapons;
+    public AudioClip[] resClip;
+
     private Resource curRes;
 
     private Resource meat;
@@ -35,16 +41,13 @@ public class Player : MonoBehaviour
     
     private AudioSource audioSource;
 
-    public List<Resource> meatStack = new List<Resource>();
-    public List<Resource> cashStack = new List<Resource>();
-
-    public GameObject[] weapons;
-    public AudioClip[] resClip;
+    private PlayerHealth playerHealth;
 
     private void Start()
     {
         stack1Tr = stack1.transform;
         stack2Tr = stack2.transform;
+        playerHealth = GetComponent<PlayerHealth>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         animator.SetBool("Axe", true);
@@ -77,6 +80,8 @@ public class Player : MonoBehaviour
 
     void PlayerMove()
     {
+        if(playerHealth.PlayerDead()) return;
+
         float x = Input.GetAxisRaw("Horizontal") + fixedJoystick.Horizontal;
         float z = Input.GetAxisRaw("Vertical") + fixedJoystick.Vertical;
         
@@ -91,6 +96,8 @@ public class Player : MonoBehaviour
 
     void UpadateAnim()
     {
+        if (playerHealth.PlayerDead()) return;
+
         animator.SetBool("isMove", moveDir.magnitude > 0);
     }
 
@@ -98,6 +105,7 @@ public class Player : MonoBehaviour
     {
         if(col.CompareTag("ENEMY"))
         {
+            if (col.GetComponent<Monster>().IsDead()) return;
             enemy = col.gameObject;
         }
         else if(col.CompareTag("MEAT"))
@@ -116,6 +124,8 @@ public class Player : MonoBehaviour
     {
         if (col.CompareTag("ENEMY"))
         {
+            if(col.GetComponent<Monster>().IsDead()) return;
+
             LookAtEnemy();
             AttackEnemy();
         }
@@ -156,6 +166,8 @@ public class Player : MonoBehaviour
 
     public void StackResource(Resource res, bool isMeat)
     {
+        if (playerHealth.PlayerDead()) return;
+
         if (res == null) return;
         
         List<Resource> stack;
@@ -205,7 +217,6 @@ public class Player : MonoBehaviour
 
     bool StopToWall()
     {
-
         return Physics.Raycast(transform.position + transform.up, transform.forward, 3, LayerMask.GetMask("Structure"));
     }
 
@@ -221,8 +232,10 @@ public class Player : MonoBehaviour
     public bool OnSight()
     {
         if(Physics.Raycast(transform.position + transform.up, transform.forward, 20, LayerMask.GetMask("ENEMY")))
+        {
             return true;
-        
+        }
+
         else
             return false;
     }
@@ -233,6 +246,24 @@ public class Player : MonoBehaviour
         if (weapon != null)
         {
             weapon.Fire();
+        }
+    }
+
+    public void ClearBackpack()
+    {
+        if(playerHealth.PlayerDead())
+        {
+            if(meatStack != null && meatStack.Count > 0)
+            {
+                Destroy(meatStack[0].gameObject);
+                meatStack.Clear();
+            }
+
+            if(cashStack != null && cashStack.Count > 0)
+            {
+                Destroy(cashStack[0].gameObject);
+                cashStack.Clear();
+            }
         }
     }
 }

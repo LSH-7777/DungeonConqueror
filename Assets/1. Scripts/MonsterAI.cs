@@ -132,6 +132,7 @@ public class MonsterAI : MonoBehaviour
 
         if (monster.IsDead() == true && isDead == false)
         {
+            GetComponent<Collider>().enabled = false;
             agent.enabled = false;
             anim.SetTrigger("Dead");
             isDead = true;

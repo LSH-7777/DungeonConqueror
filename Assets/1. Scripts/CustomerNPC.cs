@@ -29,8 +29,6 @@ public class CustomerNPC : MonoBehaviour
 
     public GameObject cashObject; 
 
-    public event System.Action<CustomerNPC> OnArrivedSpot;
-
     private void Awake()
     {
         meatShopLine = GameObject.Find("MeatShop");

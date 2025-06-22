@@ -141,6 +141,8 @@ public class PlayerHealth : MonoBehaviour
     public void Reset()
     {
         isDead = false;
+        player.ClearBackpack();
+
         player.enabled = true;
         player.transform.position = respawnPoint.position;
         curHealth = maxHealth;

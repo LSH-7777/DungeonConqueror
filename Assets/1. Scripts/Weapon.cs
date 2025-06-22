@@ -55,6 +55,8 @@ public class Weapon : MonoBehaviour
                 Debug.Log(monster);
                 if (monster != null)
                 {
+                    if(monster.IsDead()) return;
+
                     float damage = attackPower;
                     monster.curHP -= damage;
                     monster.UpdateProgressBar();

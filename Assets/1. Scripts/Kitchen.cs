@@ -1,7 +1,5 @@
 using UnityEngine;
 using System.Collections;
-using static UnityEditor.Recorder.OutputPath;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using System.Collections.Generic;
 
 public class Kitchen : MonoBehaviour

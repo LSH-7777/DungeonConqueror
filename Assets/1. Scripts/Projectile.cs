@@ -18,6 +18,8 @@ public class Projectile : MonoBehaviour
             Monster monster = col.GetComponent<Monster>();
             if (monster != null)
             {
+                if (monster.IsDead()) return;
+
                 float damage = attackPower;
                 monster.curHP -= damage;
                 monster.UpdateProgressBar();
