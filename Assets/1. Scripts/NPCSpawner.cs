@@ -7,7 +7,7 @@ public class NPCSpawner : MonoBehaviour
     public Transform NPCSpawnPoint;
 
     private MeatShop meatShop;
-    private GameObject meatShopLine;
+    private GameObject meatShopObject;
 
 
     private CustomerNPC npc = null;
@@ -15,12 +15,12 @@ public class NPCSpawner : MonoBehaviour
 
     private void Awake()
     {
-        meatShopLine = GameObject.Find("MeatShop");
+        meatShopObject = GameObject.Find("MeatShop");
     }
 
     void Start()
     {
-        meatShop = meatShopLine.GetComponent<MeatShop>();
+        meatShop = meatShopObject.GetComponent<MeatShop>();
         StartCoroutine(SpawnNPC());
     }
 
@@ -28,16 +28,15 @@ public class NPCSpawner : MonoBehaviour
     {
         while (true)
         {
-            if(meatShop.waypoints.Length > GetSpawnCount(npc))
+            if(meatShop.waypoints.Length > GetSpawnCount())
             {
-                //Instantiate(CustomerNPC, NPCSpawnPoint.position, NPCSpawnPoint.rotation);
                 npc = Instantiate(FindCustomer(), NPCSpawnPoint.position, NPCSpawnPoint.rotation).GetComponent<CustomerNPC>();
                 meatShop.AddNPC(npc);
             }
             yield return new WaitForSeconds(0.75f);
         }
     }
-    public int GetSpawnCount(CustomerNPC npc)
+    public int GetSpawnCount()
     {
         spawnCount = FindObjectsOfType<CustomerNPC>().Length;
         return spawnCount;

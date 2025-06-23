@@ -31,7 +31,6 @@ public class WeaponShop : MonoBehaviour
     {
         if(col.CompareTag("Player"))
         {
-            // Debug.Log("플레이어 접촉");
             if (col.TryGetComponent(out Player player))
             {
                 Pay(player);
@@ -82,8 +81,6 @@ public class WeaponShop : MonoBehaviour
                 return;
             }
         }
-
-        //Debug.Log("플레이어 컴포넌트 확인");
         if (player.cashStack == null)
             return;
 
@@ -91,17 +88,12 @@ public class WeaponShop : MonoBehaviour
 
         if (player.cashStack != null && player.cashStack.Count > 0)
         {
-            //Debug.Log("돈 지불");
             if (Time.time >= nextTerm)
             {
-                Debug.Log(player.cashStack.Count - 1);
-
                 player.cashStack[player.cashStack.Count - 1].transform.SetParent(null);
                 player.cashStack[player.cashStack.Count - 1].gameObject.SetActive(false);
-                //Destroy(player.cashStack[player.cashStack.Count - 1].gameObject);
                 player.cashStack.RemoveAt(player.cashStack.Count - 1);
                 
-                // player.ClearBackpackState(player.GetCurResource());
 
                 curCash -= payment;
 

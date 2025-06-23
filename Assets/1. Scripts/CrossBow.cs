@@ -5,11 +5,6 @@ public class CrossBow : Weapon
     public GameObject arrow;
     public Transform spawnPos;
 
-    private void Start()
-    {
-        SetOwner(owner);   
-    }
-
     private void Update()
     {
         AimEnemy();

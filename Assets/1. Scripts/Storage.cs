@@ -21,15 +21,14 @@ public class Storage : MonoBehaviour
 
     int addCursor = 0;           // 현재 사용할 슬롯 인덱스
     int removeCursor = 0;
-    int meatCount;
 
-    private int last = 0;
-
-    private readonly float term = 0.1f;
+    private float term = 0.1f;
     private float nextTerm = 0f;
 
     void Awake()
     {
+        // 초기화 메서드로 분리
+
         int rawLen;
 
         if(slotsRaw != null)
@@ -73,13 +72,10 @@ public class Storage : MonoBehaviour
 
     private void OnTriggerStay(Collider col)
     {
-        if (col.CompareTag("Player"))
-        {
-            if (col.TryGetComponent(out Player player))
-            {
-                UnloadMeat(player);
-            }
-        }
+      if (col.TryGetComponent(out Player player))
+      {
+          UnloadMeat(player);
+      }
     }
 
     private void UnloadMeat(Player player)
@@ -87,9 +83,9 @@ public class Storage : MonoBehaviour
 
         if (player.meatStack.Count > 0)
         {
-            last = player.meatStack.Count - 1;
+            int last = player.meatStack.Count - 1;
 
-            if (player.meatStack[last].gameObject == null)
+            if (player.meatStack[^1].gameObject == null)
             {
                 player.meatStack.RemoveAt(last);
                 return;
@@ -122,7 +118,7 @@ public class Storage : MonoBehaviour
         Transform[] nextAnchor = cooked ? nextAnchorCook : nextAnchorRaw;
         Transform[] slots = cooked ? slotsCook : slotsRaw;
 
-       Transform anchor = nextAnchor[addCursor];
+        Transform anchor = nextAnchor[addCursor];
 
         meat.transform.SetParent(anchor, true);
         meat.transform.localPosition = Vector3.zero;
@@ -138,16 +134,6 @@ public class Storage : MonoBehaviour
         nextAnchor[addCursor] = meat.chain;
 
         addCursor = (addCursor + 1) % slots.Length;
-    }
-
-    public int GetMeatCount() 
-    { 
-        return meatCount; 
-    }
-
-    public void SetMeatCount(int count)
-    {
-        meatCount = count;
     }
 
     public bool TryPopMeat(bool cooked, out Resource meat)
@@ -184,8 +170,6 @@ public class Storage : MonoBehaviour
                 meat.transform.SetParent(null);
                 meat.gameObject.SetActive(false);
 
-
-                meatCount--;
                 removeCursor = (removeCursor + 1) % stacks.Length;
                 return true;
             }

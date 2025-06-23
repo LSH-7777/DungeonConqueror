@@ -11,10 +11,6 @@ public class CashSafe : MonoBehaviour
 
     private int addCursor = 0;
     private int removeCursor = 0;
-    private int cashCount = 0;
-
-    //private readonly float term = 0.1f;
-    //private float nextTerm = 0f;
 
     private void Awake()
     {
@@ -35,7 +31,6 @@ public class CashSafe : MonoBehaviour
 
         stacks[addCursor].Add(cash);
         nextAnchor[addCursor] = cash.chain;
-        cashCount++;
 
         addCursor = (addCursor + 1) % slots.Length;
     }
@@ -51,14 +46,13 @@ public class CashSafe : MonoBehaviour
                 cash = stacks[removeCursor][last];
                 stacks[removeCursor].RemoveAt(last);
 
-                nextAnchor[removeCursor] = (stacks[removeCursor].Count == 0) 
+                nextAnchor[removeCursor] = (stacks[removeCursor].Count == 0)
                                             ? slots[removeCursor] : stacks[removeCursor][stacks[removeCursor].Count - 1].chain;
 
 
                 cash.transform.SetParent(null);
                 cash.gameObject.SetActive(false);
 
-                cashCount--;
                 removeCursor = (removeCursor + 1) % stacks.Length;
                 
                 return true;
@@ -71,21 +65,12 @@ public class CashSafe : MonoBehaviour
         return false;
     }
 
-    public int GetCashCount()
-    {
-        return cashCount;
-    }
-
     private void OnTriggerStay(Collider col)
     {
-        if(col.CompareTag("Player"))
+        if(col.TryGetComponent(out Player player) && TryPopCash(out Resource cash))
         {
-            if(col.TryGetComponent(out Player player) && TryPopCash(out Resource cash))
-            {
-                cash.gameObject.SetActive(true);
-                player.StackResource(cash, false);
-            }
+            cash.gameObject.SetActive(true);
+            player.StackResource(cash, false);
         }
     }
-
 }

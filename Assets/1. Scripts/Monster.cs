@@ -67,7 +67,6 @@ public class Monster : MonoBehaviour
             Vector3 force = new Vector3(Random.Range(-5, 5), Random.Range(5, 15), Random.Range(-5, 5));
             rb.AddForce(force, ForceMode.Impulse);
 
-            //Debug.Log("고기!");
         }
         
     }

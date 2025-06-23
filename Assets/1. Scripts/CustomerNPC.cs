@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class CustomerNPC : MonoBehaviour
 {
     protected MeatShop meatShop;
-    private GameObject meatShopLine;
+    private GameObject meatShopObject;
     
     private GameObject waypoint;
     private Waypoint spot;
@@ -31,10 +31,10 @@ public class CustomerNPC : MonoBehaviour
 
     private void Awake()
     {
-        meatShopLine = GameObject.Find("MeatShop");
+        meatShopObject = GameObject.Find("MeatShop");
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        meatShop = meatShopLine.GetComponent<MeatShop>();
+        meatShop = meatShopObject.GetComponent<MeatShop>();
 
     }
 
@@ -74,7 +74,6 @@ public class CustomerNPC : MonoBehaviour
         StartCoroutine(WatchArrival());
     }
 
-
     public void SetQueueIndex(int idx)
     {
         currentIndex = idx;
@@ -82,32 +81,27 @@ public class CustomerNPC : MonoBehaviour
 
     void MoveToDestination()
     {
-        //if (agent.pathPending) return; // 경로 계산 중이면 대기
 
         if (!HasArrived()) return;
 
-        // 목표 지점에 거의 도착했는지 확인
-        //if (agent.remainingDistance <= agent.stoppingDistance)
-        //{
-            // 다음 목표 설정
-            if (currentIndex < meatShop.waypoints.Length - 1 && currentIndex >= 0)
-            {
-                SetQueueIndex(currentIndex);
-                // currentIndex++;
-                SetNextDestination();
-            }
-            else if(currentIndex < 0)
-            {
-                SetFinalDestination();
-            }
-            else
-            {
-                // 루프하지 않고 마지막 지점이라면: 멈춤·애니메이션 등 처리
-                agent.isStopped = true;
-                animator.SetBool("isMove", false);
-            }
-       //}
+          // 다음 목표 설정
+        if (currentIndex < meatShop.waypoints.Length - 1 && currentIndex >= 0)
+        {
+            SetQueueIndex(currentIndex);
+            SetNextDestination();
+        }
+        else if(currentIndex < 0)
+        {
+             SetFinalDestination();
+        }
+        else
+        {
+            // 루프하지 않고 마지막 지점이라면: 멈춤·애니메이션 등 처리
+            agent.isStopped = true;
+            animator.SetBool("isMove", false);
+        }
     }
+
    public bool HasArrived()
     {
         if (agent.pathPending) return false;                // 아직 경로 계산 중
@@ -125,9 +119,6 @@ public class CustomerNPC : MonoBehaviour
         // 도착 처리
         agent.isStopped = true;
         animator.SetBool("isMove", false);
-
-        // 외부에 알림
-        //OnArrivedSpot?.Invoke(this);
     }
 
     public virtual bool NeedMoreMeat()
@@ -154,8 +145,8 @@ public class CustomerNPC : MonoBehaviour
 
     public virtual void GiveMoney()
     {
-        Vector3 spwanPos = transform.position + transform.forward * 0.2f + Vector3.up * 1.0f;
-        Resource cash = Instantiate(cashObject, spwanPos, transform.rotation).GetComponent<Resource>();
+        Vector3 spawnPos = transform.position + transform.forward * 0.2f + Vector3.up * 1.0f;
+        Resource cash = Instantiate(cashObject, spawnPos, transform.rotation).GetComponent<Resource>();
         
         cash.state = Resource.State.Cash;
 

@@ -26,7 +26,6 @@ public class Player : MonoBehaviour
     private Resource curRes;
 
     private Resource meat;
-    private Resource meatTop, cashTop;
 
     private Resource cash;
     private Resource curCash;
@@ -78,7 +77,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    void PlayerMove()
+    private void PlayerMove()
     {
         if(playerHealth.PlayerDead()) return;
 
@@ -94,7 +93,7 @@ public class Player : MonoBehaviour
         rbody.linearVelocity = Vector3.zero;
     }
 
-    void UpadateAnim()
+    private void UpadateAnim()
     {
         if (playerHealth.PlayerDead()) return;
 
@@ -111,7 +110,6 @@ public class Player : MonoBehaviour
         else if(col.CompareTag("MEAT"))
         {
             meat = col.GetComponent<Resource>();
-            Debug.Log("고기!");
             if(Time.time >= nextTerm)
             {
                 StackResource(meat, true);
@@ -129,7 +127,6 @@ public class Player : MonoBehaviour
             LookAtEnemy();
             AttackEnemy();
         }
-        Debug.Log("Stay");
     }
 
     private void OnTriggerExit(Collider col)
@@ -137,10 +134,9 @@ public class Player : MonoBehaviour
         animator.SetBool("Attack", false);
         enemy = null;
         enemyTr = null;
-        Debug.Log("Exit");
     }
 
-    protected void LookAtEnemy()
+    private void LookAtEnemy()
     {
         if (enemy != null)
         {
@@ -160,7 +156,6 @@ public class Player : MonoBehaviour
         if (distance <= attackRange)
         {
             animator.SetBool("Attack", true);
-            Debug.Log("공격!");
         }
     }
 
@@ -207,15 +202,10 @@ public class Player : MonoBehaviour
 
             stack.Add(res);
         
-        if (isMeat)
-            meatTop = res;
-        else
-            cashTop = res;
-
     }
 
 
-    bool StopToWall()
+    private bool StopToWall()
     {
         return Physics.Raycast(transform.position + transform.up, transform.forward, 3, LayerMask.GetMask("Structure"));
     }

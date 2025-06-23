@@ -52,7 +52,6 @@ public class Weapon : MonoBehaviour
             if (hitCollider.CompareTag("ENEMY"))
             {
                 Monster monster = hitCollider.GetComponent<Monster>();
-                Debug.Log(monster);
                 if (monster != null)
                 {
                     if(monster.IsDead()) return;

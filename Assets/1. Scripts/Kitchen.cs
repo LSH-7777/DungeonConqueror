@@ -11,7 +11,6 @@ public class Kitchen : MonoBehaviour
 
     private int addCursor = 0;
     private int removeCursor = 0;
-    private int steakCount = 0;
 
     private AudioSource audioSource;
 
@@ -20,7 +19,6 @@ public class Kitchen : MonoBehaviour
     public Transform[] slots = new Transform[2];
     public Storage storage;
     
-    //public Resource steak;
     public GameObject steakObject;
 
     public GameObject[] cookEffects;
@@ -80,7 +78,6 @@ public class Kitchen : MonoBehaviour
 
     void Cook()
     {
-        Debug.Log("Cook!");
         Resource cookedSteak = Instantiate(steakObject, transform.position, transform.rotation).GetComponent<Resource>();
         
         cookedSteak.state = Resource.State.Cooked;
@@ -98,7 +95,6 @@ public class Kitchen : MonoBehaviour
 
         stacks[addCursor].Add(cookedSteak);
         nextAnchor[addCursor] = cookedSteak.chain;
-        steakCount++;
 
         addCursor = (addCursor + 1) % slots.Length;
     }
@@ -140,7 +136,6 @@ public class Kitchen : MonoBehaviour
                 cookedMeat.transform.SetParent(null);
                 cookedMeat.gameObject.SetActive(false);
 
-                steakCount--;
                 removeCursor = (removeCursor + 1) % stacks.Length;
 
                 return true;

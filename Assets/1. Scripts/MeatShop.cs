@@ -11,10 +11,11 @@ public class MeatShop : MonoBehaviour
     public Transform leavePoint;
 
     private Queue<CustomerNPC> line = new Queue<CustomerNPC>();
-    private int curNPC;
 
     private readonly float term = 0.3f;
     //private float nextTerm = 0f;
+
+    private const int leaveIndex = -10;
 
     public Storage storage;
     public CashSafe cashSafe;
@@ -23,7 +24,6 @@ public class MeatShop : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        curNPC = line.Count;
         StartCoroutine(SellLoop());
     }
 
@@ -31,18 +31,6 @@ public class MeatShop : MonoBehaviour
     {
         line.Enqueue(npc);
         npc.SetQueueIndex(line.Count - 1);
-
-        LogQueue();
-    }
-    void LogQueue()
-    {
-        // ① 배열로 복사 → 순서 유지
-        CustomerNPC[] snapshot = line.ToArray();
-
-        // ② 인덱스:이름 형태 문자열 생성
-        string msg = string.Join(", ", snapshot.Select((npc, i) => $"{i}:{npc.name}"));
-
-        Debug.Log($"<color=green>Queue[{line.Count}] ▶ {msg}</color>");
     }
 
     void RemoveNPC()
@@ -51,7 +39,7 @@ public class MeatShop : MonoBehaviour
             return;
 
         CustomerNPC front = line.Dequeue();
-        front.currentIndex = -10;
+        front.currentIndex = leaveIndex;
 
         int idx = 0;
         foreach (CustomerNPC n in line)
@@ -73,7 +61,6 @@ public class MeatShop : MonoBehaviour
 
 
             CustomerNPC front = line.Peek(); // 맨 앞
-            Debug.Log(front.name);
 
             bool needCooked = front is CustomerNPC_Cooked; // 조리된 고기를 구매하는 NPC 확인
             

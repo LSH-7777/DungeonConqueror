@@ -21,6 +21,8 @@ public class MonsterAI : MonoBehaviour
 
     private NavMeshAgent agent;
 
+    private bool isDead = false;
+
     public AudioClip attackClip;
 
     public float attackRange = 1.0f;
@@ -103,7 +105,6 @@ public class MonsterAI : MonoBehaviour
         if (Time.time >= lastAttackTime + attackCooldown)
         {
             lastAttackTime = Time.time;
-            lastAttackTime = Time.time;
             PlayerHealth playerHealth = playerTr.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
@@ -126,8 +127,6 @@ public class MonsterAI : MonoBehaviour
 
     public void Dead()
     {
-        bool isDead = false;
-
         if (monster.IsDead() == false) return;
 
         if (monster.IsDead() == true && isDead == false)
